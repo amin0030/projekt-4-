@@ -1,52 +1,45 @@
-import { StatusBar } from 'expo-status-bar';
-import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Button } from 'react-native';
+import 'react-native-gesture-handler';
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import LoginPage from './Pages/LoginPage';
+import HomePage from './Pages/Homepage';
+import RecipePage from './Pages/RecipePage';
+import CategoryPage from './Pages/CategoryPage';
+import SearchPage from './Pages/SearchPage';
+
+const Stack = createStackNavigator();
 
 export default function App() {
-  const [forecast, setForecast] = useState(null);
-  const [counter, setCounter] = useState(0); // Counter state
-
-  useEffect(() => {
-    fetch('http://localhost:5224/weatherforecast')
-      .then((response) => response.json())
-      .then((data) => setForecast(data))
-      .catch((error) => console.error('Error fetching data:', error));
-  }, []);
-
-  const incrementCounter = () => {
-    setCounter(counter + 1); // Increment counter by 1
-  };
-
   return (
-    <View style={styles.container}>
-      <Text>Weather Forecast:</Text>
-      {forecast ? (
-        forecast.map((item, index) => (
-          <Text key={index}>
-            {item.summary} - {item.temperatureC}°C
-          </Text>
-        ))
-      ) : (
-        <Text>Loading...</Text>
-      )}
-
-      <Text style={styles.counterText}>Counter: {counter}</Text>
-      <Button title="Increment Counter" onPress={incrementCounter} />
-
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Login">
+        <Stack.Screen 
+          name="Login" 
+          component={LoginPage} 
+          options={{ title: 'Log ind' }} 
+        />
+        <Stack.Screen 
+          name="HomePage" 
+          component={HomePage} 
+          options={{ title: 'Hjem' }} 
+        />
+        <Stack.Screen 
+          name="RecipePage" 
+          component={RecipePage} 
+          options={{ title: 'Opskrift Detaljer' }} 
+        />
+        <Stack.Screen 
+          name="CategoryPage" 
+          component={CategoryPage} 
+          options={{ title: 'Kategori' }} 
+        />
+        <Stack.Screen 
+          name="SearchPage" 
+          component={SearchPage} 
+          options={{ title: 'Søg Resultater' }} 
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  counterText: {
-    fontSize: 24,
-    margin: 20,
-  },
-});
