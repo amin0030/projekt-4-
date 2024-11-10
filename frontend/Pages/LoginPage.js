@@ -4,7 +4,7 @@ import { StyleSheet, Text, View, TextInput, Button, Alert, Platform } from 'reac
 const API_BASE_URL =
   Platform.OS === 'android'
     ? 'http://10.0.2.2:5224'  // Android emulator
-    : 'http://10.31.5.168:5224'; // iOS simulator or physical devices
+    : 'http://10.192.85.0:5224'; // iOS simulator or physical devices
 
 export default function LoginPage({ navigation }) {
   const [username, setUsername] = useState('');
