@@ -99,7 +99,7 @@ app.MapPost("/login", async (AppDbContext db, UserLogin login) =>
     if (!isPasswordValid)
     {
         return Results.BadRequest("Invalid password");
-    }
+    } 
 
     return Results.Ok("Login successful");
 });
