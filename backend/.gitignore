@@ -561,3 +561,6 @@ staticwebassets.build.json
 # Ignore generated runtime config files
 *.genruntimeconfig.cache
 
+# Ignore generated JSON files in backend
+backend.sourcelink.json
+staticwebassets.build.json
