@@ -1,8 +1,10 @@
-// Program.cs
 using Projekt4;
 using Projekt4.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using OpenAI.GPT3.Extensions;
+using OpenAI.GPT3.Interfaces;
+using OpenAI.GPT3.ObjectModels.RequestModels;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -15,6 +17,12 @@ builder.WebHost.UseUrls("http://0.0.0.0:5224");
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
         sqlOptions => sqlOptions.EnableRetryOnFailure()));
+
+// Add OpenAI service
+builder.Services.AddOpenAIService(options =>
+{
+    options.ApiKey = builder.Configuration["OpenAI:ApiKey"];
+});
 
 // Add CORS to allow connections from React Native frontend
 builder.Services.AddCors(options =>
@@ -49,21 +57,25 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-// Enable Swagger middleware in development environment
-if (app.Environment.IsDevelopment())
+// Ensure Swagger works for both Development and Production
+app.UseSwagger();
+app.UseSwaggerUI(options =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Projekt4 API v1");
-        options.RoutePrefix = string.Empty;
-    });
-}
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Projekt4 API v1");
+    options.RoutePrefix = ""; // Serve Swagger UI at root ("/")
+});
 
 // Enable CORS with the "AllowAll" policy
 app.UseCors("AllowAll");
 
-// Endpoint for user registration
+// Enable routing and map controllers
+app.UseRouting();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers(); // Map all controller routes
+});
+
+// Endpoint: User Registration
 app.MapPost("/register", async (AppDbContext db, User user) =>
 {
     var existingUser = await db.Users.FirstOrDefaultAsync(u => u.Username == user.Username);
@@ -86,7 +98,7 @@ app.MapPost("/register", async (AppDbContext db, User user) =>
     return Results.Ok("User registered successfully");
 });
 
-// Endpoint for user login
+// Endpoint: User Login
 app.MapPost("/login", async (AppDbContext db, UserLogin login) =>
 {
     var user = await db.Users.FirstOrDefaultAsync(u => u.Username == login.Username);
@@ -99,12 +111,12 @@ app.MapPost("/login", async (AppDbContext db, UserLogin login) =>
     if (!isPasswordValid)
     {
         return Results.BadRequest("Invalid password");
-    } 
+    }
 
     return Results.Ok("Login successful");
 });
 
-// Endpoint to get all recipes
+// Endpoint: Get All Recipes
 app.MapGet("/recipes", async (AppDbContext db) =>
 {
     var recipes = await db.Recipes
@@ -115,7 +127,7 @@ app.MapGet("/recipes", async (AppDbContext db) =>
     return Results.Ok(recipes);
 });
 
-// Endpoint to get a specific recipe by ID
+// Endpoint: Get Recipe by ID
 app.MapGet("/recipes/{id}", async (AppDbContext db, int id) =>
 {
     var recipe = await db.Recipes
@@ -131,14 +143,14 @@ app.MapGet("/recipes/{id}", async (AppDbContext db, int id) =>
     return Results.Ok(recipe);
 });
 
-// Endpoint to get all categories
+// Endpoint: Get All Categories
 app.MapGet("/categories", async (AppDbContext db) =>
 {
     var categories = await db.Categories.ToListAsync();
     return Results.Ok(categories);
 });
 
-// Endpoint to get recipes by category ID
+// Endpoint: Get Recipes by Category ID
 app.MapGet("/categories/{categoryId}/recipes", async (AppDbContext db, int categoryId) =>
 {
     var recipes = await db.Recipes
@@ -150,7 +162,7 @@ app.MapGet("/categories/{categoryId}/recipes", async (AppDbContext db, int categ
     return Results.Ok(recipes);
 });
 
-// Endpoint to search for recipes by name or ingredient
+// Endpoint: Search Recipes by Name or Ingredient
 app.MapGet("/recipes/search", async (AppDbContext db, string query) =>
 {
     var recipes = await db.Recipes
@@ -162,7 +174,83 @@ app.MapGet("/recipes/search", async (AppDbContext db, string query) =>
     return Results.Ok(recipes);
 });
 
-// Enable routing and map controllers (if you have any controller classes)
-app.MapControllers();
+// Endpoint: Create a New Recipe
+app.MapPost("/recipes", async (AppDbContext db, Recipe recipe) =>
+{
+    db.Recipes.Add(recipe);
+    await db.SaveChangesAsync();
+    return Results.Created($"/recipes/{recipe.Id}", recipe);
+});
+
+// Endpoint: Update an Existing Recipe
+app.MapPut("/recipes/{id}", async (AppDbContext db, int id, Recipe updatedRecipe) =>
+{
+    var recipe = await db.Recipes.FindAsync(id);
+    if (recipe == null)
+    {
+        return Results.NotFound("Recipe not found");
+    }
+
+    recipe.Name = updatedRecipe.Name;
+    recipe.CategoryId = updatedRecipe.CategoryId;
+    recipe.Ingredients = updatedRecipe.Ingredients;
+    recipe.Instructions = updatedRecipe.Instructions;
+
+    await db.SaveChangesAsync();
+    return Results.Ok(recipe);
+});
+
+// Endpoint: Delete a Recipe
+app.MapDelete("/recipes/{id}", async (AppDbContext db, int id) =>
+{
+    var recipe = await db.Recipes.FindAsync(id);
+    if (recipe == null)
+    {
+        return Results.NotFound("Recipe not found");
+    }
+
+    db.Recipes.Remove(recipe);
+    await db.SaveChangesAsync();
+    return Results.Ok("Recipe deleted");
+});
+
+// Endpoint: Chatbot using OpenAI GPT
+app.MapPost("/chat", async (IOpenAIService openAIService, HttpContext context) =>
+{
+    using var reader = new StreamReader(context.Request.Body);
+    var body = await reader.ReadToEndAsync();
+
+    var input = JsonSerializer.Deserialize<ChatRequest>(body);
+
+    if (string.IsNullOrWhiteSpace(input?.Message))
+    {
+        return Results.BadRequest("Message cannot be empty.");
+    }
+
+    var completionRequest = new CompletionCreateRequest
+    {
+        Model = OpenAI.GPT3.ObjectModels.Models.TextDavinciV3,
+        Prompt = input.Message,
+        MaxTokens = 300,
+        Temperature = 0.7f
+    };
+
+    var completionResult = await openAIService.Completions.CreateCompletion(completionRequest);
+
+    if (completionResult.Successful)
+    {
+        return Results.Ok(new { response = completionResult.Choices.FirstOrDefault()?.Text.Trim() });
+    }
+    else
+    {
+        return Results.Problem("Error generating response from OpenAI.", statusCode: 500);
+    }
+});
 
 app.Run();
+
+// ChatRequest model
+public class ChatRequest
+{
+    public string Message { get; set; } = string.Empty; // Default value added
+}

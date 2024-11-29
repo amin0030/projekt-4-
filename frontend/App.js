@@ -8,6 +8,7 @@ import HomePage from './Pages/Homepage';
 import RecipePage from './Pages/RecipePage';
 import CategoryPage from './Pages/CategoryPage';
 import SearchPage from './Pages/SearchPage';
+import ChatBotPage from './Pages/ChatBotPage'; // Import the ChatBotPage
 
 const Stack = createStackNavigator();
 
@@ -44,6 +45,11 @@ export default function App() {
           name="SearchPage" 
           component={SearchPage} 
           options={{ title: 'Søg Resultater' }} 
+        />
+        <Stack.Screen 
+          name="ChatBotPage" 
+          component={ChatBotPage} 
+          options={{ title: 'ChatBot' }} // Add title for ChatBotPage
         />
       </Stack.Navigator>
     </NavigationContainer>

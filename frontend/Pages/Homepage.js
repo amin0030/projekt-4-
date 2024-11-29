@@ -1,4 +1,3 @@
-// HomePage.js
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { API_BASE_URL } from '../config';
@@ -75,7 +74,7 @@ export default function HomePage({ navigation }) {
       <FlatList
         data={categories}
         keyExtractor={(item) => item.id.toString()}
-        numColumns={2}  // Wrap into two columns
+        numColumns={2} // Wrap into two columns
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.categoryButton}
@@ -99,6 +98,14 @@ export default function HomePage({ navigation }) {
           </TouchableOpacity>
         )}
       />
+
+      {/* Button to ChatBotPage */}
+      <TouchableOpacity
+        style={styles.chatBotButton}
+        onPress={() => navigation.navigate('ChatBotPage')}
+      >
+        <Text style={styles.chatBotButtonText}>Go to ChatBot</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -116,13 +123,13 @@ const styles = StyleSheet.create({
   },
   subTitle: { fontSize: 20, fontWeight: '600', marginVertical: 16, color: '#333' },
   categoryButton: {
-    flex: 1, // Ensure buttons take equal width in columns
+    flex: 1,
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 20,
     backgroundColor: '#4CAF50',
     alignItems: 'center',
-    margin: 4, // Margin around each button for spacing
+    margin: 4,
   },
   categoryButtonText: {
     color: '#fff',
@@ -131,5 +138,16 @@ const styles = StyleSheet.create({
   },
   recipeItem: { padding: 10, borderBottomWidth: 1, borderBottomColor: '#ddd' },
   recipeName: { fontSize: 18, color: '#555' },
-  error: { color: 'red', textAlign: 'center', marginTop: 20 },
+  chatBotButton: {
+    marginTop: 20,
+    paddingVertical: 15,
+    borderRadius: 10,
+    backgroundColor: '#007BFF',
+    alignItems: 'center',
+  },
+  chatBotButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
 });

@@ -1,23 +1,26 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, Button, Alert, Platform, SafeAreaView, TouchableOpacity,  } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Button, Alert, Platform, SafeAreaView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import colors from '../config/colors';
 import { FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 
 const API_BASE_URL =
   Platform.OS === 'android'
-    ? 'http://10.192.152.50:5224'  // Android emulator
-    : 'http://10.192.152.50:5224'; // iOS simulator or physical devices
+    ? 'http://10.192.152.53:5224' // Android emulator
+    : 'http://10.192.152.53:5224'; // iOS simulator or physical devices
 
 export default function LoginPage({ navigation }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // To show a loading indicator
 
+  // Handle user login
   const handleLogin = () => {
     if (username === '' || password === '') {
-      Alert.alert('Fejl', 'Indtast både brugernavn og adgangskode');
+      Alert.alert('Error', 'Please enter both username and password.');
       return;
     }
 
+    setIsLoading(true); // Start loading
     fetch(`${API_BASE_URL}/login`, {
       method: 'POST',
       headers: {
@@ -26,50 +29,55 @@ export default function LoginPage({ navigation }) {
       body: JSON.stringify({ username, password }),
     })
       .then((response) => {
+        setIsLoading(false); // Stop loading
         if (response.ok) {
-          Alert.alert('Succes', 'Du er nu logget ind!');
+          Alert.alert('Success', 'You are now logged in!');
           navigation.navigate('HomePage');
         } else {
-          response.text().then(text => Alert.alert('Fejl', text));
+          response.text().then((text) => Alert.alert('Login Failed', text || 'Incorrect username or password.'));
         }
       })
       .catch((error) => {
-        console.error('Error logging in:', error);
-        Alert.alert('Fejl', 'Der opstod en fejl. Prøv igen senere.');
+        setIsLoading(false); // Stop loading
+        console.error('Login error:', error);
+        Alert.alert('Error', 'Network request failed. Please try again.');
       });
   };
 
+  // Handle user registration
   const handleRegister = () => {
     if (username === '' || password === '') {
-      Alert.alert('Fejl', 'Indtast både brugernavn og adgangskode');
+      Alert.alert('Error', 'Please enter both username and password.');
       return;
     }
 
+    setIsLoading(true); // Start loading
     fetch(`${API_BASE_URL}/register`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json', 
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({ username, password }),
     })
       .then((response) => {
+        setIsLoading(false); // Stop loading
         if (response.ok) {
-          Alert.alert('Succes', 'Bruger oprettet!');
+          Alert.alert('Success', 'User registered successfully!');
           navigation.navigate('HomePage');
         } else {
-          response.text().then(text => Alert.alert('Fejl', text));
+          response.text().then((text) => Alert.alert('Registration Failed', text || 'Unable to register.'));
         }
       })
       .catch((error) => {
-        console.error('Error registering:', error);
-        Alert.alert('Fejl', 'Der opstod en fejl. Prøv igen senere.');
+        setIsLoading(false); // Stop loading
+        console.error('Registration error:', error);
+        Alert.alert('Error', 'Network request failed. Please try again.');
       });
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        
         <Text style={styles.title}>Welcome!</Text>
         <Text style={styles.subtitle}>Glad to see you again</Text>
 
@@ -102,14 +110,17 @@ export default function LoginPage({ navigation }) {
         </TouchableOpacity>
 
         {/* Login Button */}
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={isLoading}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
 
         {/* Sign Up Button */}
-        <TouchableOpacity style={styles.button} onPress={handleRegister}>
-          <Text style={styles.buttonText}>SignUp</Text>
+        <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={isLoading}>
+          <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
+
+        {/* Loading Indicator */}
+        {isLoading && <ActivityIndicator size="large" color="#0000ff" style={styles.loading} />}
 
         {/* Social Login Icons */}
         <Text style={styles.orText}>Or login with</Text>
@@ -206,5 +217,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     color: '#000',
   },
-
+  loading: {
+    marginTop: 10,
+  },
 });

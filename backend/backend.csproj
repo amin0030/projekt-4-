@@ -1,21 +1,35 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
+    <!-- Målramme -->
     <TargetFramework>net8.0</TargetFramework>
+    <!-- Aktivér Nullable-referencetyper -->
     <Nullable>enable</Nullable>
+    <!-- Aktivér implicitte using-direktiver -->
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- BCrypt til hashing af passwords -->
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Betalgo.OpenAI.GPT3" Version="6.8.4" />
+    <PackageReference Include="Google.Cloud.Dialogflow.V2" Version="4.23.0" />
+    <!-- Understøttelse for CORS -->
     <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.2.0" />
+    <!-- OpenAPI til dokumentation -->
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.8" />
+    <!-- Entity Framework Core -->
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
+    <!-- Entity Framework Core Design til migrations -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <!-- SQL Server integration til Entity Framework -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.10" />
+    <!-- OpenAI API integration -->
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <!-- Swagger/Swashbuckle til API-dokumentation -->
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
