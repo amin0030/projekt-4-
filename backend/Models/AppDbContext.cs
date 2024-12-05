@@ -19,6 +19,7 @@ namespace Projekt4
         public DbSet<Ingredient> Ingredients { get; set; }
         public DbSet<Instruction> Instructions { get; set; }
         public DbSet<Recipe> Recipes { get; set; }
+        public DbSet<Favorite> Favorites { get; set; } // Tilføjet for favoritter
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -44,6 +45,9 @@ namespace Projekt4
                 .HasMany(r => r.Instructions)
                 .WithOne(instr => instr.Recipe)
                 .HasForeignKey(instr => instr.RecipeId);
+
+            modelBuilder.Entity<Favorite>()
+                .HasKey(f => f.Id);
         }
     }
 }

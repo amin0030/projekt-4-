@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using OpenAI.GPT3;
 using OpenAI.GPT3.Interfaces;
 using OpenAI.GPT3.ObjectModels.RequestModels;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Projekt4.Controllers
@@ -20,28 +21,49 @@ namespace Projekt4.Controllers
         [HttpPost]
         public async Task<IActionResult> Chat([FromBody] ChatRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.Message))
+            // Log received message
+            Console.WriteLine("Received message: " + request?.Message);
+
+            if (string.IsNullOrWhiteSpace(request?.Message))
             {
                 return BadRequest(new { error = "Message cannot be empty." });
             }
 
-            var completionRequest = new CompletionCreateRequest
+            // Brug Chat Completions API i stedet
+            var chatRequest = new ChatCompletionCreateRequest
             {
-                Model = OpenAI.GPT3.ObjectModels.Models.TextDavinciV3,
-                Prompt = request.Message,
+                Model = "gpt-3.5-turbo", // Brug chatmodel
+                Messages = new[]
+                {
+                    new OpenAI.GPT3.ObjectModels.RequestModels.ChatMessage(
+                        role: "user",
+                        content: request.Message
+                    )
+                },
                 MaxTokens = 300,
                 Temperature = 0.7f
             };
 
-            var completionResult = await _openAIService.Completions.CreateCompletion(completionRequest);
+            try
+            {
+                var chatResult = await _openAIService.ChatCompletion.CreateCompletion(chatRequest);
 
-            if (completionResult.Successful)
-            {
-                return Ok(new { response = completionResult.Choices.FirstOrDefault()?.Text.Trim() });
+                if (chatResult.Successful)
+                {
+                    var responseMessage = chatResult.Choices.FirstOrDefault()?.Message.Content.Trim();
+                    Console.WriteLine("OpenAI response received: " + responseMessage);
+                    return Ok(new { response = responseMessage });
+                }
+                else
+                {
+                    Console.WriteLine("OpenAI error: " + chatResult.Error?.Message);
+                    return StatusCode(500, new { error = "Error generating response from OpenAI.", details = chatResult.Error?.Message });
+                }
             }
-            else
+            catch (System.Exception ex)
             {
-                return StatusCode(500, new { error = "Error generating response from OpenAI." });
+                Console.WriteLine("Unexpected error: " + ex.Message);
+                return StatusCode(500, new { error = "An unexpected error occurred.", details = ex.Message });
             }
         }
     }
