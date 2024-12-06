@@ -1,11 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { API_BASE_URL } from '../config';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { API_BASE_URL } from "../config";
 
 export default function HomePage({ navigation }) {
   const [recipes, setRecipes] = useState([]);
   const [filteredRecipes, setFilteredRecipes] = useState([]);
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
   const [categories, setCategories] = useState([]);
   const [error, setError] = useState(null);
 
@@ -26,8 +35,8 @@ export default function HomePage({ navigation }) {
         console.error("Backend response error:", response.status, response.statusText);
       }
     } catch (error) {
-      setError('Network request failed');
-      console.error('Error fetching recipes:', error);
+      setError("Network request failed");
+      console.error("Error fetching recipes:", error);
     }
   };
 
@@ -59,95 +68,166 @@ export default function HomePage({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>All Recipes</Text>
-
       {/* Search Bar */}
-      <TextInput
-        style={styles.searchBar}
-        placeholder="Search recipes..."
-        value={searchText}
-        onChangeText={handleSearch}
-      />
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search"
+          placeholderTextColor="#666"
+          value={searchText}
+          onChangeText={handleSearch}
+        />
+        <Ionicons name="search-outline" size={20} color="#333" style={styles.searchIcon} />
+      </View>
 
       {/* Category Buttons */}
-      <Text style={styles.subTitle}>Categories</Text>
-      <FlatList
-        data={categories}
-        keyExtractor={(item) => item.id.toString()}
-        numColumns={2} // Wrap into two columns
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.categoryButton}
-            onPress={() => navigation.navigate('CategoryPage', { categoryId: item.id })}
-          >
-            <Text style={styles.categoryButtonText}>{item.name}</Text>
-          </TouchableOpacity>
-        )}
-      />
+      <View style={styles.categoryContainer}>
+        <FlatList
+          data={categories}
+          keyExtractor={(item) => item.id.toString()}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.categoryButton}
+              onPress={() => navigation.navigate("CategoryPage", { categoryId: item.id })}
+            >
+              <Text style={styles.categoryText}>{item.name}</Text>
+            </TouchableOpacity>
+          )}
+        />
+      </View>
 
-      {/* Recipe List */}
+      {/* Recipe Grid */}
       <FlatList
         data={filteredRecipes}
         keyExtractor={(item) => item.id.toString()}
+        numColumns={2}
+        columnWrapperStyle={styles.recipeRow}
         renderItem={({ item }) => (
           <TouchableOpacity
-            style={styles.recipeItem}
-            onPress={() => navigation.navigate('RecipePage', { recipeId: item.id })}
+            style={styles.recipeCard}
+            onPress={() => navigation.navigate("RecipePage", { recipeId: item.id })}
           >
-            <Text style={styles.recipeName}>{item.name}</Text>
+            <Image
+              source={{ uri: item.image }} // Assuming the API provides an image URL
+              style={styles.recipeImage}
+            />
+            <View style={styles.recipeInfo}>
+              <Text style={styles.recipeTitle}>{item.name}</Text>
+              <Text style={styles.recipeTime}>{item.time} mins</Text>
+            </View>
           </TouchableOpacity>
         )}
       />
 
-      {/* Button to ChatBotPage */}
-      <TouchableOpacity
-        style={styles.chatBotButton}
-        onPress={() => navigation.navigate('ChatBotPage')}
-      >
-        <Text style={styles.chatBotButtonText}>Go to ChatBot</Text>
-      </TouchableOpacity>
+      {/* Bottom Navigation Bar */}
+      <View style={styles.navBar}>
+        <TouchableOpacity onPress={() => navigation.navigate("HomePage")}>
+          <Ionicons name="home-outline" size={30} color="#333" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("FriendsPage")}>
+          <Ionicons name="people-outline" size={30} color="#333" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("ChatBotPage")}>
+          <Ionicons name="chatbubble-outline" size={30} color="#333" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("ProfilePage")}>
+          <Ionicons name="person-outline" size={30} color="#333" />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: '#f8f9fa' },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 16, color: '#333' },
-  searchBar: {
-    padding: 10,
-    marginBottom: 16,
-    borderRadius: 8,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    backgroundColor: '#fff',
-  },
-  subTitle: { fontSize: 20, fontWeight: '600', marginVertical: 16, color: '#333' },
-  categoryButton: {
+  container: {
     flex: 1,
-    paddingVertical: 10,
+    backgroundColor: "#F6F7E7",
+    paddingTop: 20,
+  },
+  searchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginHorizontal: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 10,
+    backgroundColor: "#fff",
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 2,
+    marginBottom: 10,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: "#333",
+  },
+  searchIcon: {
+    marginLeft: 5,
+  },
+  categoryContainer: {
+    marginHorizontal: 16,
+    marginBottom: 10,
+  },
+  categoryButton: {
+    backgroundColor: "#fff",
+    paddingVertical: 8,
     paddingHorizontal: 15,
     borderRadius: 20,
-    backgroundColor: '#4CAF50',
-    alignItems: 'center',
-    margin: 4,
+    marginRight: 10,
+    elevation: 2,
   },
-  categoryButtonText: {
-    color: '#fff',
+  categoryText: {
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
+    color: "#333",
   },
-  recipeItem: { padding: 10, borderBottomWidth: 1, borderBottomColor: '#ddd' },
-  recipeName: { fontSize: 18, color: '#555' },
-  chatBotButton: {
-    marginTop: 20,
-    paddingVertical: 15,
+  recipeRow: {
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    marginBottom: 10,
+  },
+  recipeCard: {
+    flex: 1,
+    marginHorizontal: 8,
+    backgroundColor: "#fff",
     borderRadius: 10,
-    backgroundColor: '#007BFF',
-    alignItems: 'center',
+    overflow: "hidden",
+    elevation: 2,
   },
-  chatBotButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
+  recipeImage: {
+    width: "100%",
+    height: 100,
+  },
+  recipeInfo: {
+    padding: 10,
+  },
+  recipeTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  recipeTime: {
+    fontSize: 12,
+    color: "#777",
+  },
+  navBar: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    paddingVertical: 10,
+    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderTopColor: "#ddd",
+    elevation: 5,
+    height: 60,
   },
 });
