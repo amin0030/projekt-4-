@@ -73,114 +73,277 @@ app.UseRouting();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers(); // Map all controller routes
-});
 
-// Endpoint: User Registration
-app.MapPost("/register", async (AppDbContext db, User user) =>
-{
-    var existingUser = await db.Users.FirstOrDefaultAsync(u => u.Username == user.Username);
-    if (existingUser != null)
+    // Endpoint: Get All Categories
+    endpoints.MapGet("/categories", async (AppDbContext db) =>
     {
-        return Results.BadRequest("Username already exists");
-    }
+        var categories = await db.Categories.ToListAsync();
+        return Results.Ok(categories);
+    });
 
-    if (string.IsNullOrEmpty(user.Password))
+    // Endpoint: Get Recipe by ID
+    endpoints.MapGet("/recipes/{recipeId}", async (AppDbContext db, int recipeId) =>
     {
-        return Results.BadRequest("Password cannot be empty");
-    }
+        var recipe = await db.Recipes
+            .Include(r => r.Ingredients)
+            .Include(r => r.Instructions)
+            .FirstOrDefaultAsync(r => r.Id == recipeId);
 
-    user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.Password);
-    user.Password = null;
+        if (recipe == null)
+        {
+            return Results.NotFound("Recipe not found");
+        }
 
-    db.Users.Add(user);
-    await db.SaveChangesAsync();
+        var recipeDetails = new
+        {
+            recipe.Id,
+            recipe.Name,
+            recipe.Description,
+            recipe.Image,
+            Ingredients = recipe.Ingredients.Select(i => new { i.Id, i.Name }),
+            Instructions = recipe.Instructions.Select(instr => new { instr.Id, instr.Step, instr.Description })
+        };
 
-    return Results.Ok("User registered successfully");
-});
+        return Results.Ok(recipeDetails);
+    });
 
-// Endpoint: Add Recipe to Favorites
-app.MapPost("/favorites", async (AppDbContext db, int userId, int recipeId) =>
-{
-    var user = await db.Users.Include(u => u.FavoriteRecipes).FirstOrDefaultAsync(u => u.Id == userId);
-    if (user == null)
+    // Endpoint: Get Recipes by Category
+    endpoints.MapGet("/categories/{categoryId}/recipes", async (AppDbContext db, int categoryId) =>
     {
-        return Results.NotFound("User not found");
-    }
+        var category = await db.Categories.Include(c => c.Recipes).FirstOrDefaultAsync(c => c.Id == categoryId);
+        if (category == null)
+        {
+            return Results.NotFound("Category not found");
+        }
 
-    var recipe = await db.Recipes.FindAsync(recipeId);
-    if (recipe == null)
+        var recipes = category.Recipes.Select(r => new
+        {
+            r.Id,
+            r.Name,
+            r.Description,
+            r.Image
+        });
+
+        return Results.Ok(recipes);
+    });
+
+    // Endpoint: Get All Recipes
+    endpoints.MapGet("/recipes", async (AppDbContext db) =>
     {
-        return Results.NotFound("Recipe not found");
-    }
+        var recipes = await db.Recipes
+                              .Include(r => r.Ingredients)
+                              .Include(r => r.Instructions)
+                              .Select(r => new
+                              {
+                                  r.Id,
+                                  r.Name,
+                                  r.Description,
+                                  r.Image,
+                                  Ingredients = r.Ingredients.Select(i => new { i.Id, i.Name }),
+                                  Instructions = r.Instructions.Select(instr => new { instr.Id, instr.Step, instr.Description })
+                              })
+                              .ToListAsync();
 
-    user.FavoriteRecipes.Add(recipe);
-    await db.SaveChangesAsync();
+        return Results.Ok(recipes);
+    });
 
-    return Results.Ok("Recipe added to favorites");
-});
-
-// Endpoint: Update Profile Information
-app.MapPut("/users/{id}", async (AppDbContext db, int id, User updatedUser) =>
-{
-    var user = await db.Users.FindAsync(id);
-    if (user == null)
+    // Endpoint: Search Recipes
+    endpoints.MapGet("/recipes/search", async (AppDbContext db, string query) =>
     {
-        return Results.NotFound("User not found");
-    }
+        var recipes = await db.Recipes
+                              .Where(r => r.Name.Contains(query))
+                              .Include(r => r.Ingredients)
+                              .Include(r => r.Instructions)
+                              .Select(r => new
+                              {
+                                  r.Id,
+                                  r.Name,
+                                  r.Description,
+                                  r.Image,
+                                  Ingredients = r.Ingredients.Select(i => new { i.Id, i.Name }),
+                                  Instructions = r.Instructions.Select(instr => new { instr.Id, instr.Step, instr.Description })
+                              })
+                              .ToListAsync();
 
-    user.Username = updatedUser.Username ?? user.Username;
-    user.Email = updatedUser.Email ?? user.Email;
+        return Results.Ok(recipes);
+    });
 
-    await db.SaveChangesAsync();
-    return Results.Ok("User profile updated");
-});
-
-// Endpoint: Delete Account
-app.MapDelete("/users/{id}", async (AppDbContext db, int id) =>
-{
-    var user = await db.Users.FindAsync(id);
-    if (user == null)
+    // Endpoint: Save User Profile
+    endpoints.MapPut("/users/{id}/profile", async (AppDbContext db, int id, User updatedProfile) =>
     {
-        return Results.NotFound("User not found");
-    }
+        var user = await db.Users.Include(u => u.FavoriteRecipes).FirstOrDefaultAsync(u => u.Id == id);
+        if (user == null)
+        {
+            return Results.NotFound("User not found.");
+        }
 
-    db.Users.Remove(user);
-    await db.SaveChangesAsync();
+        // Update fields
+        user.FirstName = updatedProfile.FirstName ?? user.FirstName;
+        user.LastName = updatedProfile.LastName ?? user.LastName;
+        user.Username = updatedProfile.Username ?? user.Username;
+        user.Email = updatedProfile.Email ?? user.Email;
 
-    return Results.Ok("User account deleted");
-});
+        await db.SaveChangesAsync();
 
-// Endpoint: Chatbot using OpenAI GPT
-app.MapPost("/chat", async (IOpenAIService openAIService, HttpContext context) =>
-{
-    using var reader = new StreamReader(context.Request.Body);
-    var body = await reader.ReadToEndAsync();
+        return Results.Ok(new
+        {
+            Message = "Profile updated successfully.",
+            User = new
+            {
+                user.Id,
+                user.FirstName,
+                user.LastName,
+                user.Username,
+                user.Email
+            }
+        });
+    });
 
-    var input = JsonSerializer.Deserialize<ChatRequest>(body);
-
-    if (string.IsNullOrWhiteSpace(input?.Message))
+    // Endpoint: Get User Profile
+    endpoints.MapGet("/users/{id}/profile", async (AppDbContext db, int id) =>
     {
-        return Results.BadRequest("Message cannot be empty.");
-    }
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
+        if (user == null)
+        {
+            return Results.NotFound(new { Message = "User not found" });
+        }
 
-    var completionRequest = new CompletionCreateRequest
-    {
-        Model = OpenAI.GPT3.ObjectModels.Models.TextDavinciV3,
-        Prompt = input.Message,
-        MaxTokens = 300,
-        Temperature = 0.7f
-    };
+        return Results.Ok(new
+        {
+            user.Id,
+            user.FirstName,
+            user.LastName,
+            user.Email,
+            user.Username,
+        });
+    });
 
-    var completionResult = await openAIService.Completions.CreateCompletion(completionRequest);
+    // Endpoint: Create Recipe for Logged-In User
+    endpoints.MapPost("/users/{userId}/recipes", async (AppDbContext db, int userId, Recipe recipe) =>
+    {
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        if (user == null)
+        {
+            return Results.BadRequest("User not found.");
+        }
 
-    if (completionResult.Successful)
+        if (string.IsNullOrEmpty(recipe.Name) || string.IsNullOrEmpty(recipe.Description) || recipe.CategoryId == 0)
+        {
+            return Results.BadRequest("Invalid recipe data. Please provide a name, description, and valid category ID.");
+        }
+
+        db.Recipes.Add(recipe);
+        await db.SaveChangesAsync();
+
+        return Results.Created($"/recipes/{recipe.Id}", recipe);
+    });
+
+    // Endpoint: Add Recipe to Favorites
+    endpoints.MapPost("/favorites", async (AppDbContext db, int userId, int recipeId) =>
     {
-        return Results.Ok(new { response = completionResult.Choices.FirstOrDefault()?.Text.Trim() });
-    }
-    else
+        var user = await db.Users.Include(u => u.FavoriteRecipes).FirstOrDefaultAsync(u => u.Id == userId);
+        if (user == null)
+        {
+            return Results.NotFound("User not found");
+        }
+
+        var recipe = await db.Recipes.FindAsync(recipeId);
+        if (recipe == null)
+        {
+            return Results.NotFound("Recipe not found");
+        }
+
+        user.FavoriteRecipes.Add(recipe);
+        await db.SaveChangesAsync();
+
+        return Results.Ok("Recipe added to favorites");
+    });
+
+    // Endpoint: User Registration
+    endpoints.MapPost("/register", async (AppDbContext db, User user) =>
     {
-        return Results.Problem("Error generating response from OpenAI.", statusCode: 500);
-    }
+        var existingUser = await db.Users.FirstOrDefaultAsync(u => u.Username == user.Username);
+        if (existingUser != null)
+        {
+            return Results.BadRequest("Username already exists");
+        }
+
+        if (string.IsNullOrEmpty(user.Password))
+        {
+            return Results.BadRequest("Password cannot be empty");
+        }
+
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.Password);
+        user.Password = null;
+
+        db.Users.Add(user);
+        await db.SaveChangesAsync();
+
+        return Results.Ok("User registered successfully");
+    });
+
+    // Endpoint: User Login
+    endpoints.MapPost("/login", async (AppDbContext db, UserLogin login) =>
+    {
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Username == login.Username);
+        if (user == null || !BCrypt.Net.BCrypt.Verify(login.Password, user.PasswordHash))
+        {
+            return Results.BadRequest("Invalid username or password.");
+        }
+
+        return Results.Ok(new
+        {
+            Message = "Login successful",
+            UserId = user.Id,
+            Username = user.Username,
+            Email = user.Email
+        });
+    });
+
+    // Endpoint: Delete Account
+    endpoints.MapDelete("/users/{id}", async (AppDbContext db, int id) =>
+    {
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
+        if (user == null)
+        {
+            return Results.NotFound("User not found");
+        }
+
+        db.Users.Remove(user);
+        await db.SaveChangesAsync();
+        return Results.Ok("User account deleted successfully.");
+    });
+
+    // Endpoint: Chatbot using OpenAI GPT
+    endpoints.MapPost("/chat", async (IOpenAIService openAIService, HttpContext context) =>
+    {
+        using var reader = new StreamReader(context.Request.Body);
+        var body = await reader.ReadToEndAsync();
+
+        var input = JsonSerializer.Deserialize<ChatRequest>(body);
+        if (string.IsNullOrWhiteSpace(input?.Message))
+        {
+            return Results.BadRequest("Message cannot be empty.");
+        }
+
+        var completionRequest = new CompletionCreateRequest
+        {
+            Model = OpenAI.GPT3.ObjectModels.Models.TextDavinciV3,
+            Prompt = input.Message,
+            MaxTokens = 300,
+            Temperature = 0.7f
+        };
+
+        var completionResult = await openAIService.Completions.CreateCompletion(completionRequest);
+        if (completionResult.Successful)
+        {
+            return Results.Ok(new { response = completionResult.Choices.FirstOrDefault()?.Text.Trim() });
+        }
+        else
+        {
+            return Results.Problem("Error generating response from OpenAI.", statusCode: 500);
+        }
+    });
 });
 
 app.Run();

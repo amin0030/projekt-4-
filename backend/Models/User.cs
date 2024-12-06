@@ -16,12 +16,15 @@ namespace Projekt4.Models
         public string PasswordHash { get; set; }
 
         [NotMapped]
-        public string Password { get; set; } // Bruges kun til at modtage plaintext-passwords under login/registrering
+        public string Password { get; set; } // Used only for plaintext passwords during login/registration
 
-        // Ny egenskab for Email
+        public string FirstName { get; set; } // New property
+        public string LastName { get; set; } // New property
+
+        // Email property
         public string Email { get; set; }
 
-        // Navigationsegenskab for favoritrecepter
+        // Navigation property for favorite recipes
         public ICollection<Recipe> FavoriteRecipes { get; set; } = new List<Recipe>();
     }
 }

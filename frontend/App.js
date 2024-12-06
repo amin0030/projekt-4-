@@ -14,77 +14,75 @@ import ChatBotPage from './Pages/ChatBotPage'; // Import the ChatBotPage
 import ProfilePage from './Pages/ProfilePage';
 import MyProfilePage from './Pages/MyprofilePage';
 import FavouritesPage from './Pages/FavouritesPage';
+import AddRecipePage from './Pages/AddRecipePage'; // Import the AddRecipePage
 
 const Stack = createStackNavigator();
 
- export default function App() {
+export default function App() {
   return (
-
-    
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Welcome">
-        <Stack.Screen 
-          name="Welcome" 
-          component={WelcomePage} 
-          options={{ title: 'Welcome' }} 
+        <Stack.Screen
+          name="Welcome"
+          component={WelcomePage}
+          options={{ title: 'Welcome' }}
         />
-        <Stack.Screen 
-          name="Login" 
-          component={LoginPage} 
-          options={{ title: 'Log ind' }} 
+        <Stack.Screen
+          name="Login"
+          component={LoginPage}
+          options={{ title: 'Log ind' }}
         />
-         <Stack.Screen 
-          name="Signup" 
-          component={SignUpPage} 
+        <Stack.Screen
+          name="Signup"
+          component={SignUpPage}
           options={{ headerShown: false }}
         />
-        <Stack.Screen 
-          name="HomePage" 
-          component={HomePage} 
-          options={{ title: 'Hjem' }} 
-        /> 
-        
-        <Stack.Screen 
-          name="RecipePage" 
-          component={RecipePage} 
-          options={{ title: 'Opskrift Detaljer' }} 
+        <Stack.Screen
+          name="HomePage"
+          component={HomePage}
+          options={{ title: 'Hjem' }}
         />
-        
-        <Stack.Screen 
-          name="CategoryPage" 
-          component={CategoryPage} 
-          options={{ title: 'Kategori' }} 
+        <Stack.Screen
+          name="RecipePage"
+          component={RecipePage}
+          options={{ title: 'Opskrift Detaljer' }}
         />
-        <Stack.Screen 
-          name="SearchPage" 
-          component={SearchPage} 
-          options={{ title: 'Søg Resultater' }} 
+        <Stack.Screen
+          name="CategoryPage"
+          component={CategoryPage}
+          options={{ title: 'Kategori' }}
         />
-        <Stack.Screen 
-          name="ChatBotPage" 
-          component={ChatBotPage} 
+        <Stack.Screen
+          name="SearchPage"
+          component={SearchPage}
+          options={{ title: 'Søg Resultater' }}
+        />
+        <Stack.Screen
+          name="ChatBotPage"
+          component={ChatBotPage}
           options={{ title: 'ChatBot' }} // Add title for ChatBotPage
         />
-                  <Stack.Screen
-            name="ProfilePage"
-            component={ProfilePage}
-            options={{ headerShown: false }} 
-          />
-          <Stack.Screen
-            name="MyProfilePage"
-            component={MyProfilePage}
-            options={{ headerShown: false }} 
-          />
-          <Stack.Screen
-            name="FavouritesPage"
-            component={FavouritesPage}
-            options={{ headerShown: false }} 
-          />
+        <Stack.Screen
+          name="ProfilePage"
+          component={ProfilePage}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="MyProfilePage"
+          component={MyProfilePage}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="FavouritesPage"
+          component={FavouritesPage}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="AddRecipePage"
+          component={AddRecipePage}
+          options={{ title: 'Add Recipe' }} // Add the AddRecipePage
+        />
       </Stack.Navigator>
-    </NavigationContainer> 
-    
+    </NavigationContainer>
   );
-}  
- 
-
-
+}

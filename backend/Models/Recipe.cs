@@ -13,6 +13,8 @@ namespace Projekt4.Models
 
         public string Description { get; set; } = string.Empty;
 
+        public string? Image { get; set; } = null; // Optional image URL
+
         // Foreign key to the Category
         public int CategoryId { get; set; }
         

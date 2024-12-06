@@ -16,8 +16,8 @@ import { FontAwesome, MaterialCommunityIcons, Ionicons } from "@expo/vector-icon
 
 const API_BASE_URL =
   Platform.OS === 'android'
-    ? 'http://10.192.152.53:5224' // Android emulator
-    : 'http://10.192.152.53:5224'; // iOS simulator or physical devices
+    ? 'http://10.192.145.163:5224' // Android emulator
+    : 'http://10.192.145.163:5224'; // iOS simulator or physical devices
 
 export default function LoginPage({ navigation }) {
   const [username, setUsername] = useState("");

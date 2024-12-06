@@ -6,14 +6,67 @@ import {
   TextInput,
   TouchableOpacity,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { API_BASE_URL } from '../config';
 
 export default function MyProfilePage({ navigation }) {
-  const [firstName, setFirstName] = useState('Bob');
-  const [lastName, setLastName] = useState('Lee');
-  const [email, setEmail] = useState('bob_lee@gmail.com');
-  const [password, setPassword] = useState('********');
+  const [firstName, setFirstName] = useState(''); // Default value for demonstration
+  const [lastName, setLastName] = useState('');   // Default value for demonstration
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const userId = 1; // Replace this with the actual logged-in user's ID
+
+  const handleSaveChanges = async () => {
+    const updatedProfile = {
+      firstName: firstName,
+      lastName: lastName,
+      username: `${firstName} ${lastName}`, // Optional: Create a username from first and last name
+      email: email,
+    };
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/${userId}/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedProfile),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        Alert.alert('Success', 'Profile updated successfully');
+      } else {
+        const errorData = await response.json();
+        Alert.alert('Error', errorData.message || 'Failed to update profile');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      Alert.alert('Error', 'An error occurred while updating the profile');
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        Alert.alert('Success', 'Account deleted successfully', [
+          { text: 'OK', onPress: () => navigation.navigate('LoginPage') },
+        ]);
+      } else {
+        const errorData = await response.json();
+        Alert.alert('Error', errorData.message || 'Failed to delete account');
+      }
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      Alert.alert('Error', 'An error occurred while deleting the account');
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -26,7 +79,7 @@ export default function MyProfilePage({ navigation }) {
         {/* Profile Details */}
         <View style={styles.profileContainer}>
           <View style={styles.profileImage} />
-          <Text style={styles.profileName}>Bob Lee</Text>
+          <Text style={styles.profileName}>{`${firstName} ${lastName}`}</Text>
         </View>
 
         {/* Editable Fields */}
@@ -67,12 +120,12 @@ export default function MyProfilePage({ navigation }) {
         </View>
 
         {/* Save Changes Button */}
-        <TouchableOpacity style={styles.saveButton}>
+        <TouchableOpacity style={styles.saveButton} onPress={handleSaveChanges}>
           <Text style={styles.saveButtonText}>Save Changes</Text>
         </TouchableOpacity>
 
         {/* Delete Account Button */}
-        <TouchableOpacity style={styles.deleteButton}>
+        <TouchableOpacity style={styles.deleteButton} onPress={handleDeleteAccount}>
           <Text style={styles.deleteButtonText}>Delete Account</Text>
         </TouchableOpacity>
       </View>
