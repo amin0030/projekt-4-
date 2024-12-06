@@ -1,20 +1,25 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, ScrollView, StyleSheet } from 'react-native';
 
-const API_BASE_URL = 'http://192.168.0.113:5224'; // Update with your server address
+const API_BASE_URL = 'http://10.192.152.53:5224'; // Update with your server address
 
 const ChatBotPage = () => {
     const [message, setMessage] = useState(''); // User's input
     const [chatHistory, setChatHistory] = useState([]); // History of the chat
 
     const sendMessage = async () => {
-        if (!message.trim()) return; // Avoid sending empty messages
+        if (!message.trim()) {
+            console.error("Message is empty, not sending request.");
+            return; // Avoid sending empty messages
+        }
 
         // Add user's message to chat history
         setChatHistory((prev) => [...prev, { sender: 'user', text: message }]);
 
         try {
-            const response = await fetch(`${API_BASE_URL}/chat`, {
+            console.log("Sending message to backend:", message);
+
+            const response = await fetch(`${API_BASE_URL}/api/chat`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -22,10 +27,17 @@ const ChatBotPage = () => {
                 body: JSON.stringify({ message }),
             });
 
-            const data = await response.json();
-
-            // Add bot's response to chat history
-            setChatHistory((prev) => [...prev, { sender: 'bot', text: data.response }]);
+            if (response.ok) {
+                const data = await response.json();
+                // Add bot's response to chat history
+                setChatHistory((prev) => [...prev, { sender: 'bot', text: data.response }]);
+            } else {
+                console.error("Chatbot error:", response.status, response.statusText);
+                setChatHistory((prev) => [
+                    ...prev,
+                    { sender: 'bot', text: 'Error: Unable to process your request.' },
+                ]);
+            }
         } catch (error) {
             console.error('Error:', error);
             setChatHistory((prev) => [

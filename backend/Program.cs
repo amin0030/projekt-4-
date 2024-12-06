@@ -98,120 +98,56 @@ app.MapPost("/register", async (AppDbContext db, User user) =>
     return Results.Ok("User registered successfully");
 });
 
-// Endpoint: User Login
-app.MapPost("/login", async (AppDbContext db, UserLogin login) =>
+// Endpoint: Add Recipe to Favorites
+app.MapPost("/favorites", async (AppDbContext db, int userId, int recipeId) =>
 {
-    var user = await db.Users.FirstOrDefaultAsync(u => u.Username == login.Username);
+    var user = await db.Users.Include(u => u.FavoriteRecipes).FirstOrDefaultAsync(u => u.Id == userId);
     if (user == null)
     {
-        return Results.BadRequest("User not found");
+        return Results.NotFound("User not found");
     }
 
-    bool isPasswordValid = BCrypt.Net.BCrypt.Verify(login.Password, user.PasswordHash);
-    if (!isPasswordValid)
-    {
-        return Results.BadRequest("Invalid password");
-    }
-
-    return Results.Ok("Login successful");
-});
-
-// Endpoint: Get All Recipes
-app.MapGet("/recipes", async (AppDbContext db) =>
-{
-    var recipes = await db.Recipes
-                          .Include(r => r.Ingredients)
-                          .Include(r => r.Instructions)
-                          .ToListAsync();
-
-    return Results.Ok(recipes);
-});
-
-// Endpoint: Get Recipe by ID
-app.MapGet("/recipes/{id}", async (AppDbContext db, int id) =>
-{
-    var recipe = await db.Recipes
-                         .Include(r => r.Ingredients)
-                         .Include(r => r.Instructions)
-                         .FirstOrDefaultAsync(r => r.Id == id);
-
+    var recipe = await db.Recipes.FindAsync(recipeId);
     if (recipe == null)
     {
         return Results.NotFound("Recipe not found");
     }
 
-    return Results.Ok(recipe);
-});
-
-// Endpoint: Get All Categories
-app.MapGet("/categories", async (AppDbContext db) =>
-{
-    var categories = await db.Categories.ToListAsync();
-    return Results.Ok(categories);
-});
-
-// Endpoint: Get Recipes by Category ID
-app.MapGet("/categories/{categoryId}/recipes", async (AppDbContext db, int categoryId) =>
-{
-    var recipes = await db.Recipes
-                          .Where(r => r.CategoryId == categoryId)
-                          .Include(r => r.Ingredients)
-                          .Include(r => r.Instructions)
-                          .ToListAsync();
-
-    return Results.Ok(recipes);
-});
-
-// Endpoint: Search Recipes by Name or Ingredient
-app.MapGet("/recipes/search", async (AppDbContext db, string query) =>
-{
-    var recipes = await db.Recipes
-                          .Where(r => r.Name.Contains(query))
-                          .Include(r => r.Ingredients)
-                          .Include(r => r.Instructions)
-                          .ToListAsync();
-
-    return Results.Ok(recipes);
-});
-
-// Endpoint: Create a New Recipe
-app.MapPost("/recipes", async (AppDbContext db, Recipe recipe) =>
-{
-    db.Recipes.Add(recipe);
+    user.FavoriteRecipes.Add(recipe);
     await db.SaveChangesAsync();
-    return Results.Created($"/recipes/{recipe.Id}", recipe);
+
+    return Results.Ok("Recipe added to favorites");
 });
 
-// Endpoint: Update an Existing Recipe
-app.MapPut("/recipes/{id}", async (AppDbContext db, int id, Recipe updatedRecipe) =>
+// Endpoint: Update Profile Information
+app.MapPut("/users/{id}", async (AppDbContext db, int id, User updatedUser) =>
 {
-    var recipe = await db.Recipes.FindAsync(id);
-    if (recipe == null)
+    var user = await db.Users.FindAsync(id);
+    if (user == null)
     {
-        return Results.NotFound("Recipe not found");
+        return Results.NotFound("User not found");
     }
 
-    recipe.Name = updatedRecipe.Name;
-    recipe.CategoryId = updatedRecipe.CategoryId;
-    recipe.Ingredients = updatedRecipe.Ingredients;
-    recipe.Instructions = updatedRecipe.Instructions;
+    user.Username = updatedUser.Username ?? user.Username;
+    user.Email = updatedUser.Email ?? user.Email;
 
     await db.SaveChangesAsync();
-    return Results.Ok(recipe);
+    return Results.Ok("User profile updated");
 });
 
-// Endpoint: Delete a Recipe
-app.MapDelete("/recipes/{id}", async (AppDbContext db, int id) =>
+// Endpoint: Delete Account
+app.MapDelete("/users/{id}", async (AppDbContext db, int id) =>
 {
-    var recipe = await db.Recipes.FindAsync(id);
-    if (recipe == null)
+    var user = await db.Users.FindAsync(id);
+    if (user == null)
     {
-        return Results.NotFound("Recipe not found");
+        return Results.NotFound("User not found");
     }
 
-    db.Recipes.Remove(recipe);
+    db.Users.Remove(user);
     await db.SaveChangesAsync();
-    return Results.Ok("Recipe deleted");
+
+    return Results.Ok("User account deleted");
 });
 
 // Endpoint: Chatbot using OpenAI GPT
