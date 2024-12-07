@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, ScrollView, StyleSheet } from 'react-native';
 
-const API_BASE_URL = 'http://10.192.145.163:5224'; // Update with your server address
+const API_BASE_URL = 'http://10.10.130.4:5224'; // Update with your server address
 
 const ChatBotPage = () => {
     const [message, setMessage] = useState(''); // User's input

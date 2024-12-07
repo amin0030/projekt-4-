@@ -259,28 +259,31 @@ app.UseEndpoints(endpoints =>
         return Results.Ok("Recipe added to favorites");
     });
 
-    // Endpoint: User Registration
-    endpoints.MapPost("/register", async (AppDbContext db, User user) =>
+    // Endpoint for user registration
+app.MapPost("/register", async (AppDbContext db, User user) =>
+{
+    if (string.IsNullOrEmpty(user.Username) || string.IsNullOrEmpty(user.Password))
     {
-        var existingUser = await db.Users.FirstOrDefaultAsync(u => u.Username == user.Username);
-        if (existingUser != null)
-        {
-            return Results.BadRequest("Username already exists");
-        }
+        return Results.BadRequest("Username and password are required.");
+    }
 
-        if (string.IsNullOrEmpty(user.Password))
-        {
-            return Results.BadRequest("Password cannot be empty");
-        }
+    // Check if username already exists
+    var existingUser = await db.Users.FirstOrDefaultAsync(u => u.Username == user.Username);
+    if (existingUser != null)
+    {
+        return Results.BadRequest("Username already exists.");
+    }
 
-        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.Password);
-        user.Password = null;
+    // Hash the password and save the user
+    user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.Password);
+    user.Password = null; // Avoid storing plain text passwords
 
-        db.Users.Add(user);
-        await db.SaveChangesAsync();
+    db.Users.Add(user);
+    await db.SaveChangesAsync();
 
-        return Results.Ok("User registered successfully");
-    });
+    return Results.Ok("User registered successfully.");
+});
+
 
     // Endpoint: User Login
     endpoints.MapPost("/login", async (AppDbContext db, UserLogin login) =>

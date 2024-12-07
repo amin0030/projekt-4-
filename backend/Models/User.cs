@@ -18,11 +18,10 @@ namespace Projekt4.Models
         [NotMapped]
         public string Password { get; set; } // Used only for plaintext passwords during login/registration
 
-        public string FirstName { get; set; } // New property
-        public string LastName { get; set; } // New property
+        public string? FirstName { get; set; } // Nullable
+        public string? LastName { get; set; }  // Nullable
 
-        // Email property
-        public string Email { get; set; }
+        public string? Email { get; set; } // Nullable (if needed)
 
         // Navigation property for favorite recipes
         public ICollection<Recipe> FavoriteRecipes { get; set; } = new List<Recipe>();
