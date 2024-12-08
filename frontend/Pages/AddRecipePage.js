@@ -8,8 +8,9 @@ import {
     SafeAreaView,
     Alert,
     FlatList,
+    ScrollView,
 } from 'react-native';
-import { API_BASE_URL } from '../config';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function AddRecipePage({ route, navigation }) {
     const { userId } = route.params;
@@ -40,61 +41,53 @@ export default function AddRecipePage({ route, navigation }) {
             Alert.alert('Error', 'Please provide both step number and description.');
             return;
         }
-        setInstructions([...instructions, { step: parseInt(instructionStep, 10), description: instructionDescription }]);
+        setInstructions([
+            ...instructions,
+            { step: parseInt(instructionStep, 10), description: instructionDescription },
+        ]);
         setInstructionStep('');
         setInstructionDescription('');
     };
 
-    const handleAddRecipe = async () => {
-        const newRecipe = {
-            name,
-            description,
-            categoryId: parseInt(categoryId, 10),
-            ingredients,
-            instructions,
-        };
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/users/${userId}/recipes`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(newRecipe),
-            });
-
-            if (response.ok) {
-                Alert.alert('Success', 'Recipe added successfully');
-                navigation.goBack(); // Go back to ProfilePage
-            } else {
-                const errorData = await response.json();
-                Alert.alert('Error', errorData.message || 'Failed to add recipe');
-            }
-        } catch (error) {
-            console.error('Error adding recipe:', error);
-            Alert.alert('Error', 'An error occurred while adding the recipe');
-        }
-    };
-
     return (
         <SafeAreaView style={styles.safeArea}>
-            <View style={styles.container}>
+            <ScrollView contentContainerStyle={styles.container}>
+                {/* Back Button */}
+                <TouchableOpacity
+                    style={styles.backButton}
+                    onPress={() => navigation.navigate('HomePage')}
+                >
+                    <Ionicons name="arrow-back" size={24} color="#000" />
+                </TouchableOpacity>
+
                 <Text style={styles.title}>Add New Recipe</Text>
+
+                {/* Recipe Name */}
+                <Text style={styles.label}>Recipe Name</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="Recipe Name"
+                    placeholder="Enter recipe name"
+                    placeholderTextColor="#666"
                     value={name}
                     onChangeText={setName}
                 />
+
+                {/* Description */}
+                <Text style={styles.label}>Description</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="Description"
+                    placeholder="Enter description"
+                    placeholderTextColor="#666"
                     value={description}
                     onChangeText={setDescription}
                 />
+
+                {/* Category */}
+                <Text style={styles.label}>Category ID</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="Category ID"
+                    placeholder="Enter category ID"
+                    placeholderTextColor="#666"
                     value={categoryId}
                     onChangeText={setCategoryId}
                 />
@@ -104,18 +97,22 @@ export default function AddRecipePage({ route, navigation }) {
                 <TextInput
                     style={styles.input}
                     placeholder="Ingredient Name"
+                    placeholderTextColor="#666"
                     value={ingredientName}
                     onChangeText={setIngredientName}
                 />
                 <TextInput
                     style={styles.input}
                     placeholder="Quantity"
+                    placeholderTextColor="#666"
                     value={ingredientQuantity}
                     onChangeText={setIngredientQuantity}
                 />
-                <TouchableOpacity style={styles.addSubItemButton} onPress={handleAddIngredient}>
-                    <Text style={styles.addSubItemButtonText}>Add Ingredient</Text>
+                <TouchableOpacity style={styles.addIngredientButton} onPress={handleAddIngredient}>
+                    <Text style={styles.addIngredientText}>Add Ingredient</Text>
                 </TouchableOpacity>
+
+                {/* Ingredients List */}
                 <FlatList
                     data={ingredients}
                     keyExtractor={(item, index) => `${item.name}-${index}`}
@@ -131,6 +128,7 @@ export default function AddRecipePage({ route, navigation }) {
                 <TextInput
                     style={styles.input}
                     placeholder="Step Number"
+                    placeholderTextColor="#666"
                     keyboardType="numeric"
                     value={instructionStep}
                     onChangeText={setInstructionStep}
@@ -138,12 +136,15 @@ export default function AddRecipePage({ route, navigation }) {
                 <TextInput
                     style={styles.input}
                     placeholder="Step Description"
+                    placeholderTextColor="#666"
                     value={instructionDescription}
                     onChangeText={setInstructionDescription}
                 />
-                <TouchableOpacity style={styles.addSubItemButton} onPress={handleAddInstruction}>
-                    <Text style={styles.addSubItemButtonText}>Add Instruction</Text>
+                <TouchableOpacity style={styles.addInstructionButton} onPress={handleAddInstruction}>
+                    <Text style={styles.addInstructionText}>Add Instruction</Text>
                 </TouchableOpacity>
+
+                {/* Instructions List */}
                 <FlatList
                     data={instructions}
                     keyExtractor={(item, index) => `${item.step}-${index}`}
@@ -155,10 +156,10 @@ export default function AddRecipePage({ route, navigation }) {
                 />
 
                 {/* Add Recipe Button */}
-                <TouchableOpacity style={styles.addButton} onPress={handleAddRecipe}>
-                    <Text style={styles.addButtonText}>Add Recipe</Text>
+                <TouchableOpacity style={styles.addRecipeButton}>
+                    <Text style={styles.addRecipeText}>Add Recipe</Text>
                 </TouchableOpacity>
-            </View>
+            </ScrollView>
         </SafeAreaView>
     );
 }
@@ -166,56 +167,98 @@ export default function AddRecipePage({ route, navigation }) {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#F6F7E7',
+        backgroundColor: '#F6F7E7', // Background color matches the app theme
     },
     container: {
-        flex: 1,
-        padding: 20,
+        paddingHorizontal: 20,
+        paddingVertical: 30,
     },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
+    backButton: {
+        alignSelf: 'flex-start',
         marginBottom: 20,
     },
-    sectionTitle: {
-        fontSize: 20,
+    title: {
+        fontSize: 28,
+        fontWeight: '700',
+        color: '#333',
+        marginBottom: 20,
+        textAlign: 'center', 
+    },
+    label: {
+        fontSize: 16,
         fontWeight: '600',
-        marginBottom: 10,
+        color: '#555',
+        marginBottom: 5,
     },
     input: {
         borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 10,
-        paddingHorizontal: 10,
-        paddingVertical: 15,
-        marginBottom: 20,
+        borderColor: '#DDD',
+        backgroundColor: '#FFF',
+        borderRadius: 8,
+        padding: 10,
         fontSize: 16,
+        marginBottom: 15,
     },
-    addSubItemButton: {
-        backgroundColor: '#007BFF',
-        paddingVertical: 10,
-        borderRadius: 5,
-        alignItems: 'center',
-        marginBottom: 20,
-    },
-    addSubItemButtonText: {
-        color: '#fff',
-        fontSize: 16,
-    },
-    addButton: {
-        backgroundColor: '#28a745',
-        paddingVertical: 15,
-        borderRadius: 10,
-        alignItems: 'center',
-        marginTop: 20,
-    },
-    addButtonText: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: 'bold',
+    sectionTitle: {
+        fontSize: 22,
+        fontWeight: '700',
+        color: '#444',
+        marginVertical: 15,
     },
     listItem: {
         fontSize: 16,
+        color: '#444',
         marginVertical: 5,
+    },
+    addIngredientButton: {
+        backgroundColor: '#E7F6F8',
+        paddingVertical: 10,
+        borderRadius: 10,
+        alignItems: 'center',
+        marginBottom: 15,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        shadowOffset: { width: 0, height: 2 },
+    },
+    addIngredientText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#000',
+    },
+    addInstructionButton: {
+        backgroundColor: '#E7F6F8',
+        paddingVertical: 10,
+        borderRadius: 10,
+        alignItems: 'center',
+        marginBottom: 15,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        shadowOffset: { width: 0, height: 2 },
+    },
+    addInstructionText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#000',
+    },
+    addRecipeButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 15,
+        backgroundColor: '#F6F7E7',
+        borderRadius: 10,
+        marginTop: 20,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        shadowOffset: { width: 0, height: 2 },
+    },
+    addRecipeText: {
+        marginLeft: 10,
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#000',
     },
 });

@@ -121,6 +121,14 @@ export default function HomePage({ navigation }) {
         )}
       />
 
+      {/* Add Recipe Floating Button */}
+      <TouchableOpacity
+        style={styles.addRecipeButton}
+        onPress={() => navigation.navigate("AddRecipePage")}
+      >
+        <Ionicons name="add" size={36} color="#fff" />
+      </TouchableOpacity>
+
       {/* Bottom Navigation Bar */}
       <View style={styles.navBar}>
         <TouchableOpacity onPress={() => navigation.navigate("HomePage")}>
@@ -214,6 +222,22 @@ const styles = StyleSheet.create({
   recipeTime: {
     fontSize: 12,
     color: "#777",
+  },
+  addRecipeButton: {
+    position: "absolute",
+    bottom: 80, // Adjust to position above the nav bar
+    right: 20,
+    backgroundColor: "#CACBBA",
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 5,
   },
   navBar: {
     position: "absolute",
