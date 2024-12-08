@@ -9,8 +9,11 @@ import {
     Alert,
     FlatList,
     ScrollView,
+    ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+
+const API_BASE_URL = 'http://10.10.130.6:5224'; // Replace with your actual API base URL
 
 export default function AddRecipePage({ route, navigation }) {
     const { userId } = route.params;
@@ -26,6 +29,9 @@ export default function AddRecipePage({ route, navigation }) {
     const [instructionStep, setInstructionStep] = useState('');
     const [instructionDescription, setInstructionDescription] = useState('');
 
+    const [isLoading, setIsLoading] = useState(false); // To show loading spinner while submitting
+
+    // Handle adding ingredients
     const handleAddIngredient = () => {
         if (!ingredientName || !ingredientQuantity) {
             Alert.alert('Error', 'Please provide both ingredient name and quantity.');
@@ -36,6 +42,7 @@ export default function AddRecipePage({ route, navigation }) {
         setIngredientQuantity('');
     };
 
+    // Handle adding instructions
     const handleAddInstruction = () => {
         if (!instructionStep || !instructionDescription) {
             Alert.alert('Error', 'Please provide both step number and description.');
@@ -49,13 +56,56 @@ export default function AddRecipePage({ route, navigation }) {
         setInstructionDescription('');
     };
 
+    // Function to handle adding recipe (POST request)
+    const handleAddRecipe = () => {
+        if (!name || !description || !categoryId || ingredients.length === 0 || instructions.length === 0) {
+            Alert.alert('Error', 'Please fill in all fields and add ingredients and instructions.');
+            return;
+        }
+
+        const newRecipe = {
+            userId: userId,
+            name: name,
+            description: description,
+            categoryId: parseInt(categoryId), // Ensure categoryId is an integer
+            ingredients: ingredients,
+            instructions: instructions,
+        };
+
+        setIsLoading(true); // Start loading
+
+        // Send the recipe data to the backend
+        fetch(`${API_BASE_URL}/users/${userId}/recipes`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newRecipe),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                setIsLoading(false); // Stop loading
+                if (data && data.id) {
+                    Alert.alert('Success', 'Recipe added successfully!');
+                    navigation.goBack(); // Go back to the previous screen after success
+                } else {
+                    Alert.alert('Error', 'Something went wrong. Please try again.');
+                }
+            })
+            .catch((error) => {
+                setIsLoading(false); // Stop loading
+                console.error('Error adding recipe:', error);
+                Alert.alert('Error', 'Network request failed. Please try again.');
+            });
+    };
+
     return (
         <SafeAreaView style={styles.safeArea}>
             <ScrollView contentContainerStyle={styles.container}>
                 {/* Back Button */}
                 <TouchableOpacity
                     style={styles.backButton}
-                    onPress={() => navigation.navigate('HomePage')}
+                    onPress={() => navigation.goBack()}
                 >
                     <Ionicons name="arrow-back" size={24} color="#000" />
                 </TouchableOpacity>
@@ -67,7 +117,6 @@ export default function AddRecipePage({ route, navigation }) {
                 <TextInput
                     style={styles.input}
                     placeholder="Enter recipe name"
-                    placeholderTextColor="#666"
                     value={name}
                     onChangeText={setName}
                 />
@@ -77,7 +126,6 @@ export default function AddRecipePage({ route, navigation }) {
                 <TextInput
                     style={styles.input}
                     placeholder="Enter description"
-                    placeholderTextColor="#666"
                     value={description}
                     onChangeText={setDescription}
                 />
@@ -87,7 +135,6 @@ export default function AddRecipePage({ route, navigation }) {
                 <TextInput
                     style={styles.input}
                     placeholder="Enter category ID"
-                    placeholderTextColor="#666"
                     value={categoryId}
                     onChangeText={setCategoryId}
                 />
@@ -97,14 +144,12 @@ export default function AddRecipePage({ route, navigation }) {
                 <TextInput
                     style={styles.input}
                     placeholder="Ingredient Name"
-                    placeholderTextColor="#666"
                     value={ingredientName}
                     onChangeText={setIngredientName}
                 />
                 <TextInput
                     style={styles.input}
                     placeholder="Quantity"
-                    placeholderTextColor="#666"
                     value={ingredientQuantity}
                     onChangeText={setIngredientQuantity}
                 />
@@ -128,7 +173,6 @@ export default function AddRecipePage({ route, navigation }) {
                 <TextInput
                     style={styles.input}
                     placeholder="Step Number"
-                    placeholderTextColor="#666"
                     keyboardType="numeric"
                     value={instructionStep}
                     onChangeText={setInstructionStep}
@@ -136,7 +180,6 @@ export default function AddRecipePage({ route, navigation }) {
                 <TextInput
                     style={styles.input}
                     placeholder="Step Description"
-                    placeholderTextColor="#666"
                     value={instructionDescription}
                     onChangeText={setInstructionDescription}
                 />
@@ -156,9 +199,12 @@ export default function AddRecipePage({ route, navigation }) {
                 />
 
                 {/* Add Recipe Button */}
-                <TouchableOpacity style={styles.addRecipeButton}>
+                <TouchableOpacity style={styles.addRecipeButton} onPress={handleAddRecipe} disabled={isLoading}>
                     <Text style={styles.addRecipeText}>Add Recipe</Text>
                 </TouchableOpacity>
+
+                {/* Loading Indicator */}
+                {isLoading && <ActivityIndicator size="large" color="#0000ff" style={styles.loading} />}
             </ScrollView>
         </SafeAreaView>
     );
@@ -182,7 +228,7 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         color: '#333',
         marginBottom: 20,
-        textAlign: 'center', 
+        textAlign: 'center',
     },
     label: {
         fontSize: 16,
@@ -260,5 +306,8 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         color: '#000',
+    },
+    loading: {
+        marginTop: 20,
     },
 });

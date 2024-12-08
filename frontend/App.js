@@ -80,7 +80,7 @@ export default function App() {
         <Stack.Screen
           name="AddRecipePage"
           component={AddRecipePage}
-          options={{ title: 'Add Recipe' }} // Add the AddRecipePage
+          options={{ title: 'Add New Recipe' }} // Customize the header title for AddRecipePage
         />
       </Stack.Navigator>
     </NavigationContainer>

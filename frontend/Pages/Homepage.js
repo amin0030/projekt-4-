@@ -18,18 +18,21 @@ export default function HomePage({ navigation }) {
   const [categories, setCategories] = useState([]);
   const [error, setError] = useState(null);
 
+  const userId = 1; // Assuming this is the logged-in user's ID. You can replace this with dynamic data.
+
   useEffect(() => {
     fetchRecipes();
     fetchCategories();
   }, []);
 
+  // Fetch recipes from the API
   const fetchRecipes = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/recipes`);
       if (response.ok) {
         const data = await response.json();
         setRecipes(data);
-        setFilteredRecipes(data);
+        setFilteredRecipes(data); // Initially, show all recipes
       } else {
         setError("Failed to fetch recipes.");
         console.error("Backend response error:", response.status, response.statusText);
@@ -40,12 +43,13 @@ export default function HomePage({ navigation }) {
     }
   };
 
+  // Fetch categories from the API
   const fetchCategories = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/categories`);
       if (response.ok) {
         const data = await response.json();
-        setCategories(data);
+        setCategories(data); // Set categories
       } else {
         console.error("Failed to fetch categories:", response.status, response.statusText);
       }
@@ -54,6 +58,7 @@ export default function HomePage({ navigation }) {
     }
   };
 
+  // Handle search functionality
   const handleSearch = (text) => {
     setSearchText(text);
     if (text) {
@@ -124,7 +129,7 @@ export default function HomePage({ navigation }) {
       {/* Add Recipe Floating Button */}
       <TouchableOpacity
         style={styles.addRecipeButton}
-        onPress={() => navigation.navigate("AddRecipePage")}
+        onPress={() => navigation.navigate("AddRecipePage", { userId })} // Passing userId to AddRecipePage
       >
         <Ionicons name="add" size={36} color="#fff" />
       </TouchableOpacity>

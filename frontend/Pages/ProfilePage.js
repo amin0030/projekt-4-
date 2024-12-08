@@ -88,14 +88,7 @@ export default function ProfilePage({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        {/* Add Recipe Button */}
-        <TouchableOpacity
-          style={styles.addRecipeButton}
-          onPress={() => navigation.navigate('AddRecipePage', { userId })}
-        >
-          <Ionicons name="add-circle-outline" size={20} color="#000" />
-          <Text style={styles.addRecipeText}>Add Recipe</Text>
-        </TouchableOpacity>
+        
 
         {/* Logout Button */}
         <TouchableOpacity style={styles.logoutButton}>
