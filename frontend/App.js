@@ -22,7 +22,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Welcome">
-        <Stack.Screen
+         <Stack.Screen
           name="Welcome"
           component={WelcomePage}
           options={{ title: 'Welcome' }}
@@ -56,13 +56,13 @@ export default function App() {
           name="SearchPage"
           component={SearchPage}
           options={{ title: 'Søg Resultater' }}
-        />
+        /> 
         <Stack.Screen
           name="ChatBotPage"
           component={ChatBotPage}
           options={{ title: 'ChatBot' }} // Add title for ChatBotPage
         />
-        <Stack.Screen
+         <Stack.Screen
           name="ProfilePage"
           component={ProfilePage}
           options={{ headerShown: false }}
@@ -81,7 +81,7 @@ export default function App() {
           name="AddRecipePage"
           component={AddRecipePage}
           options={{ title: 'Add New Recipe' }} // Customize the header title for AddRecipePage
-        />
+        /> 
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -117,6 +117,7 @@ export default function AddRecipePage({ route, navigation }) {
                 <TextInput
                     style={styles.input}
                     placeholder="Enter recipe name"
+                    placeholderTextColor="#666"
                     value={name}
                     onChangeText={setName}
                 />
@@ -126,6 +127,7 @@ export default function AddRecipePage({ route, navigation }) {
                 <TextInput
                     style={styles.input}
                     placeholder="Enter description"
+                    placeholderTextColor="#666"
                     value={description}
                     onChangeText={setDescription}
                 />
@@ -135,6 +137,7 @@ export default function AddRecipePage({ route, navigation }) {
                 <TextInput
                     style={styles.input}
                     placeholder="Enter category ID"
+                    placeholderTextColor="#666"
                     value={categoryId}
                     onChangeText={setCategoryId}
                 />
@@ -144,12 +147,14 @@ export default function AddRecipePage({ route, navigation }) {
                 <TextInput
                     style={styles.input}
                     placeholder="Ingredient Name"
+                    placeholderTextColor="#666"
                     value={ingredientName}
                     onChangeText={setIngredientName}
                 />
                 <TextInput
                     style={styles.input}
                     placeholder="Quantity"
+                    placeholderTextColor="#666"
                     value={ingredientQuantity}
                     onChangeText={setIngredientQuantity}
                 />
@@ -173,6 +178,7 @@ export default function AddRecipePage({ route, navigation }) {
                 <TextInput
                     style={styles.input}
                     placeholder="Step Number"
+                    placeholderTextColor="#666"
                     keyboardType="numeric"
                     value={instructionStep}
                     onChangeText={setInstructionStep}
@@ -180,6 +186,7 @@ export default function AddRecipePage({ route, navigation }) {
                 <TextInput
                     style={styles.input}
                     placeholder="Step Description"
+                    placeholderTextColor="#666"
                     value={instructionDescription}
                     onChangeText={setInstructionDescription}
                 />
