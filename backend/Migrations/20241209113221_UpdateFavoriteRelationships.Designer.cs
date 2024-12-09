@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Projekt4;
 
@@ -11,9 +12,11 @@ using Projekt4;
 namespace backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241209113221_UpdateFavoriteRelationships")]
+    partial class UpdateFavoriteRelationships
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1313,7 +1316,6 @@ namespace backend.Migrations
                             Id = 1,
                             CategoryId = 1,
                             Description = "",
-                            Image = "/Pictures/pancakes.jpg",
                             Name = "Pancakes"
                         },
                         new
@@ -1321,7 +1323,6 @@ namespace backend.Migrations
                             Id = 2,
                             CategoryId = 2,
                             Description = "",
-                            Image = "/Pictures/grilledcheese.jpg",
                             Name = "Grilled Cheese Sandwich"
                         },
                         new
@@ -1329,7 +1330,6 @@ namespace backend.Migrations
                             Id = 3,
                             CategoryId = 3,
                             Description = "",
-                            Image = "/Pictures/carbonara.jpg",
                             Name = "Spaghetti Carbonara"
                         },
                         new
@@ -1337,7 +1337,6 @@ namespace backend.Migrations
                             Id = 4,
                             CategoryId = 2,
                             Description = "",
-                            Image = "/Pictures/caesarsalad.jpg",
                             Name = "Caesar Salad"
                         },
                         new
@@ -1345,7 +1344,6 @@ namespace backend.Migrations
                             Id = 5,
                             CategoryId = 1,
                             Description = "",
-                            Image = "/Pictures/omelette.jpg",
                             Name = "Omelette"
                         },
                         new
@@ -1353,7 +1351,6 @@ namespace backend.Migrations
                             Id = 6,
                             CategoryId = 1,
                             Description = "",
-                            Image = "/Pictures/FrenchToast.jpg",
                             Name = "French Toast"
                         },
                         new
@@ -1361,7 +1358,6 @@ namespace backend.Migrations
                             Id = 7,
                             CategoryId = 4,
                             Description = "",
-                            Image = "/Pictures/cake.jpg",
                             Name = "Chocolate Cake"
                         },
                         new
@@ -1369,7 +1365,6 @@ namespace backend.Migrations
                             Id = 8,
                             CategoryId = 4,
                             Description = "",
-                            Image = "/Pictures/applepie.jpg",
                             Name = "Apple Pie"
                         },
                         new
@@ -1377,7 +1372,6 @@ namespace backend.Migrations
                             Id = 9,
                             CategoryId = 3,
                             Description = "",
-                            Image = "/Pictures/tacos.jpg",
                             Name = "Tacos"
                         },
                         new
@@ -1385,7 +1379,6 @@ namespace backend.Migrations
                             Id = 10,
                             CategoryId = 3,
                             Description = "",
-                            Image = "/Pictures/chickencurry.jpg",
                             Name = "Chicken Curry"
                         },
                         new
@@ -1393,7 +1386,6 @@ namespace backend.Migrations
                             Id = 11,
                             CategoryId = 3,
                             Description = "",
-                            Image = "/Pictures/beefstew.jpg",
                             Name = "Beef Stew"
                         },
                         new
@@ -1401,7 +1393,6 @@ namespace backend.Migrations
                             Id = 12,
                             CategoryId = 2,
                             Description = "",
-                            Image = "/Pictures/FishChips.jpg",
                             Name = "Fish and Chips"
                         },
                         new
@@ -1409,7 +1400,6 @@ namespace backend.Migrations
                             Id = 13,
                             CategoryId = 2,
                             Description = "",
-                            Image = "/Pictures/Mushroom.jpg",
                             Name = "Mushroom Soup"
                         },
                         new
@@ -1417,7 +1407,6 @@ namespace backend.Migrations
                             Id = 14,
                             CategoryId = 3,
                             Description = "",
-                            Image = "/Pictures/chicken.jpg",
                             Name = "Roast Chicken"
                         },
                         new
@@ -1425,7 +1414,6 @@ namespace backend.Migrations
                             Id = 15,
                             CategoryId = 1,
                             Description = "",
-                            Image = "/Pictures/233920-Tender-Waffles.jpg",
                             Name = "Waffles"
                         },
                         new
@@ -1433,7 +1421,6 @@ namespace backend.Migrations
                             Id = 16,
                             CategoryId = 2,
                             Description = "",
-                            Image = "/Pictures/PastaSalad.jpg",
                             Name = "Pasta Salad"
                         },
                         new
@@ -1441,7 +1428,6 @@ namespace backend.Migrations
                             Id = 17,
                             CategoryId = 3,
                             Description = "",
-                            Image = "/Pictures/BBQribs.jpg",
                             Name = "BBQ Ribs"
                         },
                         new
@@ -1449,7 +1435,6 @@ namespace backend.Migrations
                             Id = 18,
                             CategoryId = 3,
                             Description = "",
-                            Image = "/Pictures/steak.jpg",
                             Name = "Steak"
                         },
                         new
@@ -1457,7 +1442,6 @@ namespace backend.Migrations
                             Id = 19,
                             CategoryId = 4,
                             Description = "",
-                            Image = "/Pictures/fruitsalad.jpg",
                             Name = "Fruit Salad"
                         },
                         new
@@ -1465,7 +1449,6 @@ namespace backend.Migrations
                             Id = 20,
                             CategoryId = 4,
                             Description = "",
-                            Image = "/Pictures/bananabread.jpg",
                             Name = "Banana Bread"
                         });
                 });

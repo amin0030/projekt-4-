@@ -10,10 +10,12 @@ import {
     FlatList,
     ScrollView,
     ActivityIndicator,
+    Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 
-const API_BASE_URL = 'http://10.10.130.6:5224'; // Replace with your actual API base URL
+const API_BASE_URL = 'http://10.31.5.72:5224'; // Replace with your actual API base URL
 
 export default function AddRecipePage({ route, navigation }) {
     const { userId } = route.params;
@@ -23,13 +25,37 @@ export default function AddRecipePage({ route, navigation }) {
     const [categoryId, setCategoryId] = useState('');
     const [ingredients, setIngredients] = useState([]);
     const [instructions, setInstructions] = useState([]);
+    const [image, setImage] = useState(null);
 
     const [ingredientName, setIngredientName] = useState('');
     const [ingredientQuantity, setIngredientQuantity] = useState('');
     const [instructionStep, setInstructionStep] = useState('');
     const [instructionDescription, setInstructionDescription] = useState('');
 
-    const [isLoading, setIsLoading] = useState(false); // To show loading spinner while submitting
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Handle picking an image
+    const handlePickImage = async () => {
+        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (!permissionResult.granted) {
+            Alert.alert('Permission required', 'You need to allow access to your photos to upload an image.');
+            return;
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            console.log("Selected Image URI:", result.assets[0].uri); // Debug URI
+            setImage(result.assets[0].uri);
+        } else {
+            console.log("Image selection canceled");
+        }
+    };
 
     // Handle adding ingredients
     const handleAddIngredient = () => {
@@ -58,8 +84,8 @@ export default function AddRecipePage({ route, navigation }) {
 
     // Function to handle adding recipe (POST request)
     const handleAddRecipe = () => {
-        if (!name || !description || !categoryId || ingredients.length === 0 || instructions.length === 0) {
-            Alert.alert('Error', 'Please fill in all fields and add ingredients and instructions.');
+        if (!name || !description || !categoryId || ingredients.length === 0 || instructions.length === 0 || !image) {
+            Alert.alert('Error', 'Please fill in all fields, add ingredients and instructions, and select an image.');
             return;
         }
 
@@ -67,14 +93,16 @@ export default function AddRecipePage({ route, navigation }) {
             userId: userId,
             name: name,
             description: description,
-            categoryId: parseInt(categoryId), // Ensure categoryId is an integer
+            categoryId: parseInt(categoryId),
             ingredients: ingredients,
             instructions: instructions,
+            image: image,
         };
 
-        setIsLoading(true); // Start loading
+        console.log("Submitting Recipe:", newRecipe); // Debugging
 
-        // Send the recipe data to the backend
+        setIsLoading(true);
+
         fetch(`${API_BASE_URL}/users/${userId}/recipes`, {
             method: 'POST',
             headers: {
@@ -84,16 +112,16 @@ export default function AddRecipePage({ route, navigation }) {
         })
             .then((response) => response.json())
             .then((data) => {
-                setIsLoading(false); // Stop loading
+                setIsLoading(false);
                 if (data && data.id) {
                     Alert.alert('Success', 'Recipe added successfully!');
-                    navigation.goBack(); // Go back to the previous screen after success
+                    navigation.goBack();
                 } else {
                     Alert.alert('Error', 'Something went wrong. Please try again.');
                 }
             })
             .catch((error) => {
-                setIsLoading(false); // Stop loading
+                setIsLoading(false);
                 console.error('Error adding recipe:', error);
                 Alert.alert('Error', 'Network request failed. Please try again.');
             });
@@ -102,17 +130,12 @@ export default function AddRecipePage({ route, navigation }) {
     return (
         <SafeAreaView style={styles.safeArea}>
             <ScrollView contentContainerStyle={styles.container}>
-                {/* Back Button */}
-                <TouchableOpacity
-                    style={styles.backButton}
-                    onPress={() => navigation.goBack()}
-                >
+                <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
                     <Ionicons name="arrow-back" size={24} color="#000" />
                 </TouchableOpacity>
 
                 <Text style={styles.title}>Add New Recipe</Text>
 
-                {/* Recipe Name */}
                 <Text style={styles.label}>Recipe Name</Text>
                 <TextInput
                     style={styles.input}
@@ -121,7 +144,6 @@ export default function AddRecipePage({ route, navigation }) {
                     onChangeText={setName}
                 />
 
-                {/* Description */}
                 <Text style={styles.label}>Description</Text>
                 <TextInput
                     style={styles.input}
@@ -130,7 +152,6 @@ export default function AddRecipePage({ route, navigation }) {
                     onChangeText={setDescription}
                 />
 
-                {/* Category */}
                 <Text style={styles.label}>Category ID</Text>
                 <TextInput
                     style={styles.input}
@@ -139,7 +160,16 @@ export default function AddRecipePage({ route, navigation }) {
                     onChangeText={setCategoryId}
                 />
 
-                {/* Ingredients Section */}
+                <Text style={styles.label}>Recipe Image</Text>
+                <TouchableOpacity style={styles.imagePickerButton} onPress={handlePickImage}>
+                    <Text style={styles.imagePickerText}>Pick an Image</Text>
+                </TouchableOpacity>
+                {image ? (
+                    <Image source={{ uri: image }} style={styles.imagePreview} />
+                ) : (
+                    <Text style={styles.noImageText}>No image selected</Text>
+                )}
+
                 <Text style={styles.sectionTitle}>Ingredients</Text>
                 <TextInput
                     style={styles.input}
@@ -157,7 +187,6 @@ export default function AddRecipePage({ route, navigation }) {
                     <Text style={styles.addIngredientText}>Add Ingredient</Text>
                 </TouchableOpacity>
 
-                {/* Ingredients List */}
                 <FlatList
                     data={ingredients}
                     keyExtractor={(item, index) => `${item.name}-${index}`}
@@ -168,7 +197,6 @@ export default function AddRecipePage({ route, navigation }) {
                     )}
                 />
 
-                {/* Instructions Section */}
                 <Text style={styles.sectionTitle}>Instructions</Text>
                 <TextInput
                     style={styles.input}
@@ -187,7 +215,6 @@ export default function AddRecipePage({ route, navigation }) {
                     <Text style={styles.addInstructionText}>Add Instruction</Text>
                 </TouchableOpacity>
 
-                {/* Instructions List */}
                 <FlatList
                     data={instructions}
                     keyExtractor={(item, index) => `${item.step}-${index}`}
@@ -198,12 +225,10 @@ export default function AddRecipePage({ route, navigation }) {
                     )}
                 />
 
-                {/* Add Recipe Button */}
                 <TouchableOpacity style={styles.addRecipeButton} onPress={handleAddRecipe} disabled={isLoading}>
                     <Text style={styles.addRecipeText}>Add Recipe</Text>
                 </TouchableOpacity>
 
-                {/* Loading Indicator */}
                 {isLoading && <ActivityIndicator size="large" color="#0000ff" style={styles.loading} />}
             </ScrollView>
         </SafeAreaView>
@@ -213,7 +238,7 @@ export default function AddRecipePage({ route, navigation }) {
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: '#F6F7E7', // Background color matches the app theme
+        backgroundColor: '#F6F7E7',
     },
     container: {
         paddingHorizontal: 20,
@@ -245,11 +270,29 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginBottom: 15,
     },
-    sectionTitle: {
-        fontSize: 22,
-        fontWeight: '700',
-        color: '#444',
-        marginVertical: 15,
+    imagePickerButton: {
+        backgroundColor: '#E7F6F8',
+        padding: 10,
+        borderRadius: 10,
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    imagePickerText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#000',
+    },
+    imagePreview: {
+        width: '100%',
+        height: 200,
+        borderRadius: 10,
+        marginBottom: 15,
+    },
+    noImageText: {
+        textAlign: 'center',
+        fontSize: 16,
+        color: '#888',
+        marginBottom: 15,
     },
     listItem: {
         fontSize: 16,
@@ -262,10 +305,6 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         alignItems: 'center',
         marginBottom: 15,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-        shadowOffset: { width: 0, height: 2 },
     },
     addIngredientText: {
         fontSize: 16,
@@ -278,10 +317,6 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         alignItems: 'center',
         marginBottom: 15,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-        shadowOffset: { width: 0, height: 2 },
     },
     addInstructionText: {
         fontSize: 16,
@@ -296,13 +331,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#F6F7E7',
         borderRadius: 10,
         marginTop: 20,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 5,
-        shadowOffset: { width: 0, height: 2 },
     },
     addRecipeText: {
-        marginLeft: 10,
         fontSize: 18,
         fontWeight: 'bold',
         color: '#000',

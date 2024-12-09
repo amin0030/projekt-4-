@@ -24,6 +24,7 @@ namespace Projekt4.Models
         public string? Email { get; set; } // Nullable (if needed)
 
         // Navigation property for favorite recipes
-        public ICollection<Recipe> FavoriteRecipes { get; set; } = new List<Recipe>();
+        public ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
+
     }
 }

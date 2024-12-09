@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Projekt4;
 
@@ -11,9 +12,11 @@ using Projekt4;
 namespace backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241209144646_AddRecipeImages")]
+    partial class AddRecipeImages
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1321,7 +1324,7 @@ namespace backend.Migrations
                             Id = 2,
                             CategoryId = 2,
                             Description = "",
-                            Image = "/Pictures/grilledcheese.jpg",
+                            Image = "https://www.tasteofhome.com/wp-content/uploads/2018/12/The-Best-Ever-Grilled-Cheese-Sandwiches_EXPS_SDFM19_90781_C10_19_4b-2.jpg",
                             Name = "Grilled Cheese Sandwich"
                         },
                         new
@@ -1329,7 +1332,7 @@ namespace backend.Migrations
                             Id = 3,
                             CategoryId = 3,
                             Description = "",
-                            Image = "/Pictures/carbonara.jpg",
+                            Image = "https://www.cookingclassy.com/wp-content/uploads/2019/10/spag..hetti-carbonara-20.jpg",
                             Name = "Spaghetti Carbonara"
                         },
                         new
@@ -1337,7 +1340,7 @@ namespace backend.Migrations
                             Id = 4,
                             CategoryId = 2,
                             Description = "",
-                            Image = "/Pictures/caesarsalad.jpg",
+                            Image = "https://www.loveandlemons.com/wp-content/uploads/2020/03/caesar-salad.jpg",
                             Name = "Caesar Salad"
                         },
                         new
@@ -1345,7 +1348,7 @@ namespace backend.Migrations
                             Id = 5,
                             CategoryId = 1,
                             Description = "",
-                            Image = "/Pictures/omelette.jpg",
+                            Image = "https://www.cookist.com/wp-content/uploads/2019/01/omelette-638x425.jpg",
                             Name = "Omelette"
                         },
                         new
@@ -1353,7 +1356,7 @@ namespace backend.Migrations
                             Id = 6,
                             CategoryId = 1,
                             Description = "",
-                            Image = "/Pictures/FrenchToast.jpg",
+                            Image = "https://www.mccormick.com/-/media/mccormick-us/recipes/mccormick/q/2000/quick-and-easy-french-toast.jpg",
                             Name = "French Toast"
                         },
                         new
@@ -1361,7 +1364,7 @@ namespace backend.Migrations
                             Id = 7,
                             CategoryId = 4,
                             Description = "",
-                            Image = "/Pictures/cake.jpg",
+                            Image = "https://www.crazyforcrust.com/wp-content/uploads/2020/05/easy-fluffy-pancakes-5-of-12.jpg",
                             Name = "Chocolate Cake"
                         },
                         new
@@ -1369,7 +1372,7 @@ namespace backend.Migrations
                             Id = 8,
                             CategoryId = 4,
                             Description = "",
-                            Image = "/Pictures/applepie.jpg",
+                            Image = "https://www.cubesnjuliennes.com/wp-content/uploads/2020/04/Fluffy-Pancake-Recipe.jpg",
                             Name = "Apple Pie"
                         },
                         new
@@ -1377,7 +1380,7 @@ namespace backend.Migrations
                             Id = 9,
                             CategoryId = 3,
                             Description = "",
-                            Image = "/Pictures/tacos.jpg",
+                            Image = "https://www.cubesnjuliennes.com/wp-content/uploads/2020/04/Fluffy-Pancake-Recipe.jpg",
                             Name = "Tacos"
                         },
                         new
@@ -1385,7 +1388,7 @@ namespace backend.Migrations
                             Id = 10,
                             CategoryId = 3,
                             Description = "",
-                            Image = "/Pictures/chickencurry.jpg",
+                            Image = "https://www.cubesnjuliennes.com/wp-content/uploads/2020/04/Fluffy-Pancake-Recipe.jpg",
                             Name = "Chicken Curry"
                         },
                         new
@@ -1393,7 +1396,7 @@ namespace backend.Migrations
                             Id = 11,
                             CategoryId = 3,
                             Description = "",
-                            Image = "/Pictures/beefstew.jpg",
+                            Image = "https://www.cubesnjuliennes.com/wp-content/uploads/2020/04/Fluffy-Pancake-Recipe.jpg",
                             Name = "Beef Stew"
                         },
                         new
@@ -1401,7 +1404,7 @@ namespace backend.Migrations
                             Id = 12,
                             CategoryId = 2,
                             Description = "",
-                            Image = "/Pictures/FishChips.jpg",
+                            Image = "https://www.cubesnjuliennes.com/wp-content/uploads/2020/04/Fluffy-Pancake-Recipe.jpg",
                             Name = "Fish and Chips"
                         },
                         new
@@ -1409,7 +1412,7 @@ namespace backend.Migrations
                             Id = 13,
                             CategoryId = 2,
                             Description = "",
-                            Image = "/Pictures/Mushroom.jpg",
+                            Image = "https://www.cubesnjuliennes.com/wp-content/uploads/2020/04/Fluffy-Pancake-Recipe.jpg",
                             Name = "Mushroom Soup"
                         },
                         new
@@ -1417,7 +1420,7 @@ namespace backend.Migrations
                             Id = 14,
                             CategoryId = 3,
                             Description = "",
-                            Image = "/Pictures/chicken.jpg",
+                            Image = "https://www.eatwell101.com/wp-content/uploads/2019/11/Roasted-Chicken-Recipe.jpg",
                             Name = "Roast Chicken"
                         },
                         new
@@ -1425,7 +1428,7 @@ namespace backend.Migrations
                             Id = 15,
                             CategoryId = 1,
                             Description = "",
-                            Image = "/Pictures/233920-Tender-Waffles.jpg",
+                            Image = "https://www.crazyforcrust.com/wp-content/uploads/2020/05/easy-fluffy-pancakes-5-of-12.jpg",
                             Name = "Waffles"
                         },
                         new
@@ -1433,7 +1436,7 @@ namespace backend.Migrations
                             Id = 16,
                             CategoryId = 2,
                             Description = "",
-                            Image = "/Pictures/PastaSalad.jpg",
+                            Image = "https://www.cubesnjuliennes.com/wp-content/uploads/2020/04/Fluffy-Pancake-Recipe.jpg",
                             Name = "Pasta Salad"
                         },
                         new
@@ -1441,7 +1444,7 @@ namespace backend.Migrations
                             Id = 17,
                             CategoryId = 3,
                             Description = "",
-                            Image = "/Pictures/BBQribs.jpg",
+                            Image = "https://www.cubesnjuliennes.com/wp-content/uploads/2020/04/Fluffy-Pancake-Recipe.jpg",
                             Name = "BBQ Ribs"
                         },
                         new
@@ -1449,7 +1452,7 @@ namespace backend.Migrations
                             Id = 18,
                             CategoryId = 3,
                             Description = "",
-                            Image = "/Pictures/steak.jpg",
+                            Image = "https://www.cubesnjuliennes.com/wp-content/uploads/2020/04/Fluffy-Pancake-Recipe.jpg",
                             Name = "Steak"
                         },
                         new
@@ -1457,7 +1460,7 @@ namespace backend.Migrations
                             Id = 19,
                             CategoryId = 4,
                             Description = "",
-                            Image = "/Pictures/fruitsalad.jpg",
+                            Image = "https://www.cubesnjuliennes.com/wp-content/uploads/2020/04/Fluffy-Pancake-Recipe.jpg",
                             Name = "Fruit Salad"
                         },
                         new
@@ -1465,7 +1468,7 @@ namespace backend.Migrations
                             Id = 20,
                             CategoryId = 4,
                             Description = "",
-                            Image = "/Pictures/bananabread.jpg",
+                            Image = "https://www.cubesnjuliennes.com/wp-content/uploads/2020/04/Fluffy-Pancake-Recipe.jpg",
                             Name = "Banana Bread"
                         });
                 });

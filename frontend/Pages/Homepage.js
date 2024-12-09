@@ -11,6 +11,14 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { API_BASE_URL } from "../config";
 
+// Helper function to normalize image paths
+const normalizeImagePath = (imagePath) => {
+  if (imagePath.startsWith("http") || imagePath.startsWith("file")) {
+    return imagePath;
+  }
+  return `${API_BASE_URL}${imagePath}`;
+};
+
 export default function HomePage({ navigation }) {
   const [recipes, setRecipes] = useState([]);
   const [filteredRecipes, setFilteredRecipes] = useState([]);
@@ -31,8 +39,15 @@ export default function HomePage({ navigation }) {
       const response = await fetch(`${API_BASE_URL}/recipes`);
       if (response.ok) {
         const data = await response.json();
-        setRecipes(data);
-        setFilteredRecipes(data); // Initially, show all recipes
+
+        // Normalize image paths for all recipes
+        const normalizedData = data.map((recipe) => ({
+          ...recipe,
+          image: normalizeImagePath(recipe.image),
+        }));
+
+        setRecipes(normalizedData);
+        setFilteredRecipes(normalizedData); // Initially, show all recipes
       } else {
         setError("Failed to fetch recipes.");
         console.error("Backend response error:", response.status, response.statusText);
@@ -115,7 +130,7 @@ export default function HomePage({ navigation }) {
             onPress={() => navigation.navigate("RecipePage", { recipeId: item.id })}
           >
             <Image
-              source={{ uri: item.image }} // Assuming the API provides an image URL
+              source={{ uri: item.image }} // Image path is now normalized
               style={styles.recipeImage}
             />
             <View style={styles.recipeInfo}>

@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
-import { API_BASE_URL } from '../config'; // Ensure this points to your backend API base URL
+import { API_BASE_URL } from '../config';
 
 export default function ProfilePage({ navigation }) {
   const [userData, setUserData] = useState({
@@ -20,13 +20,13 @@ export default function ProfilePage({ navigation }) {
   });
   const userId = 1; // Replace with the actual logged-in user's ID
 
-  // Function to fetch profile data
   const fetchProfile = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/users/${userId}/profile`);
       if (response.ok) {
         const data = await response.json();
-        setUserData(data); // Update the state with the user data
+        setUserData(data);
+        console.log('Profile data fetched:', data); // Debug log
       } else {
         const errorData = await response.json();
         Alert.alert('Error', errorData.message || 'Failed to fetch profile');
@@ -37,15 +37,14 @@ export default function ProfilePage({ navigation }) {
     }
   };
 
-  // UseEffect to fetch data when the page loads
   useEffect(() => {
     fetchProfile();
+    console.log('ProfilePage userId:', userId); // Debugging userId
   }, []);
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* Back Button */}
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.navigate('HomePage')}
@@ -53,10 +52,9 @@ export default function ProfilePage({ navigation }) {
           <Ionicons name="arrow-back" size={24} color="#000" />
         </TouchableOpacity>
 
-        {/* Profile Details */}
         <View style={styles.profileContainer}>
           <Image
-            source={require('../assets/dp.webp')} // Replace with your profile picture
+            source={require('../assets/dp.webp')}
             style={styles.profileImage}
           />
           <Text style={styles.profileName}>
@@ -64,11 +62,10 @@ export default function ProfilePage({ navigation }) {
           </Text>
         </View>
 
-        {/* Menu Options */}
         <View style={styles.menuContainer}>
           <TouchableOpacity
             style={styles.menuItem}
-            onPress={() => navigation.navigate('MyProfilePage')} // Navigate to MyProfilePage
+            onPress={() => navigation.navigate('MyProfilePage')}
           >
             <FontAwesome name="user-o" size={20} color="#000" />
             <Text style={styles.menuText}>My Profile</Text>
@@ -76,7 +73,10 @@ export default function ProfilePage({ navigation }) {
 
           <TouchableOpacity
             style={styles.menuItem}
-            onPress={() => navigation.navigate('FavouritesPage')}
+            onPress={() => {
+              console.log('Navigating to FavouritesPage with userId:', userId); // Debug log
+              navigation.navigate('FavouritesPage', { userId });
+            }}
           >
             <FontAwesome name="heart-o" size={20} color="#000" />
             <Text style={styles.menuText}>Favourites</Text>
@@ -88,9 +88,6 @@ export default function ProfilePage({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        
-
-        {/* Logout Button */}
         <TouchableOpacity style={styles.logoutButton}>
           <Ionicons name="log-out-outline" size={20} color="#000" />
           <Text style={styles.logoutText}>Logout</Text>
@@ -142,21 +139,6 @@ const styles = StyleSheet.create({
   menuText: {
     marginLeft: 15,
     fontSize: 18,
-    color: '#000',
-  },
-  addRecipeButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 15,
-    backgroundColor: '#E7F6F8',
-    borderRadius: 10,
-    marginTop: 20,
-  },
-  addRecipeText: {
-    marginLeft: 10,
-    fontSize: 18,
-    fontWeight: 'bold',
     color: '#000',
   },
   logoutButton: {

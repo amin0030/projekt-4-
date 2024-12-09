@@ -69,6 +69,13 @@ app.UseSwaggerUI(options =>
 app.UseCors("AllowAll");
 
 // Enable routing and map controllers
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "Pictures")),
+    RequestPath = "/Pictures"
+});
+
 app.UseRouting();
 app.UseEndpoints(endpoints =>
 {
@@ -171,7 +178,10 @@ app.UseEndpoints(endpoints =>
     // Endpoint: Save User Profile
     endpoints.MapPut("/users/{id}/profile", async (AppDbContext db, int id, User updatedProfile) =>
     {
-        var user = await db.Users.Include(u => u.FavoriteRecipes).FirstOrDefaultAsync(u => u.Id == id);
+        var user = await db.Users
+    .Include(u => u.Favorites) // Use Favorites, as defined in the User model
+    .FirstOrDefaultAsync(u => u.Id == id);
+
         if (user == null)
         {
             return Results.NotFound("User not found.");
@@ -238,26 +248,67 @@ app.UseEndpoints(endpoints =>
         return Results.Created($"/recipes/{recipe.Id}", recipe);
     });
 
-    // Endpoint: Add Recipe to Favorites
-    endpoints.MapPost("/favorites", async (AppDbContext db, int userId, int recipeId) =>
+ // Unified Endpoint: Handle Fetching and Adding Favorites
+endpoints.MapPost("/users/{userId}/favorites", async (AppDbContext db, int userId, FavoriteRequest? favoriteRequest) =>
+{
+    Console.WriteLine($"Handling favorites for UserId={userId}");
+
+    // Fetch favorites if no request body is provided
+    if (favoriteRequest == null)
     {
-        var user = await db.Users.Include(u => u.FavoriteRecipes).FirstOrDefaultAsync(u => u.Id == userId);
-        if (user == null)
-        {
-            return Results.NotFound("User not found");
-        }
+        Console.WriteLine("Fetching favorites...");
+        var favorites = await db.Favorites
+            .Where(f => f.UserId == userId)
+            .Include(f => f.Recipe)
+            .Select(f => new
+            {
+                f.Recipe.Id,
+                f.Recipe.Name,
+                f.Recipe.Description,
+                f.Recipe.Image,
+                f.CreatedAt
+            })
+            .ToListAsync();
 
-        var recipe = await db.Recipes.FindAsync(recipeId);
-        if (recipe == null)
-        {
-            return Results.NotFound("Recipe not found");
-        }
+        return Results.Ok(favorites);
+    }
 
-        user.FavoriteRecipes.Add(recipe);
-        await db.SaveChangesAsync();
+    // Add to favorites if request body is provided
+    Console.WriteLine($"Received FavoriteRequest: {JsonSerializer.Serialize(favoriteRequest)}");
 
-        return Results.Ok("Recipe added to favorites");
-    });
+    if (favoriteRequest.RecipeId <= 0)
+    {
+        return Results.BadRequest(new { message = "Invalid recipe ID provided." });
+    }
+
+    var recipe = await db.Recipes.FirstOrDefaultAsync(r => r.Id == favoriteRequest.RecipeId);
+    if (recipe == null)
+    {
+        return Results.BadRequest(new { message = "Recipe not found." });
+    }
+
+    var favoriteExists = await db.Favorites.AnyAsync(f =>
+        f.UserId == userId && f.RecipeId == favoriteRequest.RecipeId);
+
+    if (favoriteExists)
+    {
+        return Results.BadRequest(new { message = "Recipe is already in favorites." });
+    }
+
+    var newFavorite = new Favorite
+    {
+        UserId = userId,
+        RecipeId = favoriteRequest.RecipeId,
+        CreatedAt = DateTime.UtcNow,
+    };
+
+    db.Favorites.Add(newFavorite);
+    await db.SaveChangesAsync();
+
+    return Results.Ok(new { message = "Recipe added to favorites successfully." });
+});
+
+
 
     // Endpoint for user registration
 app.MapPost("/register", async (AppDbContext db, User user) =>
