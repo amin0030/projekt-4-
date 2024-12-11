@@ -51,7 +51,3 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '16'  # Specify the Node version based on your project's needs
-
-      # Step 3: Install frontend dependencies
-      - name: Install dependencies
-        run: npm install
