@@ -7,48 +7,58 @@ on:
   pull_request:
     branches:
       - main
-
 jobs:
-  backend:
+  build-and-test:
     runs-on: ubuntu-latest
+
     steps:
-      # Step 1: Checkout the code
+      # Checkout code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 2: Set up .NET environment
+      # Set up .NET Core environment
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0'
 
-      # Step 3: Restore dependencies
+      # Restore dependencies
       - name: Restore dependencies
         run: dotnet restore
 
-      # Step 4: Build and test the backend
+      # Build the project
       - name: Build the project
         run: dotnet build --no-restore
 
-      - name: Run backend tests and collect coverage
+      # Run tests and collect coverage
+      - name: Run tests and collect coverage
         run: |
           dotnet test --collect:"XPlat Code Coverage" --logger:"junit;MethodFormat=Class;FailureBodyFormat=Verbose"
 
-      # Step 5: Install ReportGenerator and generate report
+      # List files for debugging purposes
+      - name: List files in the directory
+        run: |
+          ls -R
+
+      # Install ReportGenerator tool
       - name: Install ReportGenerator
         run: dotnet tool install -g dotnet-reportgenerator-globaltool
 
-      - name: Generate backend coverage report
+      # Generate the coverage report
+      - name: Generate coverage report
         run: |
           reportgenerator -reports:**/coverage.cobertura.xml -targetdir:coveragereport -reporttypes:Html;TextSummary
 
-      # Step 6: Upload backend coverage artifacts
-      - name: Upload backend artifacts
+      # Display coverage summary
+      - name: Display coverage summary
+        run: cat coveragereport/Summary.txt
+
+      # Upload test results and coverage artifacts
+      - name: Upload coverage report
         uses: actions/upload-artifact@v3
         with:
-          name: coverage-report-backend
+          name: coverage-report
           path: coveragereport
-
 
   frontend:
     runs-on: ubuntu-latest
