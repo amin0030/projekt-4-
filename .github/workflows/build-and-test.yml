@@ -38,10 +38,6 @@ jobs:
       - name: Install ReportGenerator
         run: dotnet tool install -g dotnet-reportgenerator-globaltool
 
-      - name: Generate backend coverage report
-        run: |
-          reportgenerator -reports:**/coverage.cobertura.xml -targetdir:coveragereport -reporttypes:Html;TextSummary
-
   frontend:
     runs-on: ubuntu-latest
     needs: backend  # This ensures the backend job completes before the frontend job starts
