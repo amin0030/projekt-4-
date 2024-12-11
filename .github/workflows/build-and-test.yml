@@ -7,58 +7,40 @@ on:
   pull_request:
     branches:
       - main
-jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
 
+jobs:
+  backend:
+    runs-on: ubuntu-latest
     steps:
-      # Checkout code
+      # Step 1: Checkout the code
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Set up .NET Core environment
+      # Step 2: Set up .NET environment
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0'
 
-      # Restore dependencies
+      # Step 3: Restore dependencies
       - name: Restore dependencies
         run: dotnet restore
 
-      # Build the project
+      # Step 4: Build and test the backend
       - name: Build the project
         run: dotnet build --no-restore
 
-      # Run tests and collect coverage
-      - name: Run tests and collect coverage
+      - name: Run backend tests and collect coverage
         run: |
           dotnet test --collect:"XPlat Code Coverage" --logger:"junit;MethodFormat=Class;FailureBodyFormat=Verbose"
 
-      # List files for debugging purposes
-      - name: List files in the directory
-        run: |
-          ls -R
-
-      # Install ReportGenerator tool
+      # Step 5: Install ReportGenerator and generate report
       - name: Install ReportGenerator
         run: dotnet tool install -g dotnet-reportgenerator-globaltool
 
-      # Generate the coverage report
-      - name: Generate coverage report
+      - name: Generate backend coverage report
         run: |
           reportgenerator -reports:**/coverage.cobertura.xml -targetdir:coveragereport -reporttypes:Html;TextSummary
-
-      # Display coverage summary
-      - name: Display coverage summary
-        run: cat coveragereport/Summary.txt
-
-      # Upload test results and coverage artifacts
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage-report
-          path: coveragereport
 
   frontend:
     runs-on: ubuntu-latest
@@ -77,15 +59,3 @@ jobs:
       # Step 3: Install frontend dependencies
       - name: Install dependencies
         run: npm install
-
-      # Step 4: Run frontend tests
-      - name: Run frontend tests
-        run: npm test -- --coverage  # Assuming you are using Jest for testing
-
-      # Step 5: Upload frontend coverage results
-      - name: Upload frontend test coverage
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage-report-frontend
-          path: coverage  # Assuming Jest generates a "coverage" folder
-
