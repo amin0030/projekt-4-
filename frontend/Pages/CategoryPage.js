@@ -68,6 +68,7 @@ export default function CategoryPage({ route, navigation }) {
   );
 }
 
+// css styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
