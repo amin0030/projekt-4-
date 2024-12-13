@@ -11,7 +11,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { API_BASE_URL } from "../config";
 
-// Helper function to normalize image paths
+
 const normalizeImagePath = (imagePath) => {
   if (imagePath.startsWith("http") || imagePath.startsWith("file")) {
     return imagePath;
@@ -26,28 +26,28 @@ export default function HomePage({ navigation }) {
   const [categories, setCategories] = useState([]);
   const [error, setError] = useState(null);
 
-  const userId = 1; // Assuming this is the logged-in user's ID. You can replace this with dynamic data.
+  const userId = 1; 
 
   useEffect(() => {
     fetchRecipes();
     fetchCategories();
   }, []);
 
-  // Fetch recipes from the API
+  
   const fetchRecipes = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/recipes`);
       if (response.ok) {
         const data = await response.json();
 
-        // Normalize image paths for all recipes
+        
         const normalizedData = data.map((recipe) => ({
           ...recipe,
           image: normalizeImagePath(recipe.image),
         }));
 
         setRecipes(normalizedData);
-        setFilteredRecipes(normalizedData); // Initially, show all recipes
+        setFilteredRecipes(normalizedData); 
       } else {
         setError("Failed to fetch recipes.");
         console.error("Backend response error:", response.status, response.statusText);
@@ -58,13 +58,13 @@ export default function HomePage({ navigation }) {
     }
   };
 
-  // Fetch categories from the API
+  
   const fetchCategories = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/categories`);
       if (response.ok) {
         const data = await response.json();
-        setCategories(data); // Set categories
+        setCategories(data); 
       } else {
         console.error("Failed to fetch categories:", response.status, response.statusText);
       }
@@ -73,7 +73,7 @@ export default function HomePage({ navigation }) {
     }
   };
 
-  // Handle search functionality
+  
   const handleSearch = (text) => {
     setSearchText(text);
     if (text) {
@@ -130,7 +130,7 @@ export default function HomePage({ navigation }) {
             onPress={() => navigation.navigate("RecipePage", { recipeId: item.id })}
           >
             <Image
-              source={{ uri: item.image }} // Image path is now normalized
+              source={{ uri: item.image }} 
               style={styles.recipeImage}
             />
             <View style={styles.recipeInfo}>
@@ -144,7 +144,7 @@ export default function HomePage({ navigation }) {
       {/* Add Recipe Floating Button */}
       <TouchableOpacity
         style={styles.addRecipeButton}
-        onPress={() => navigation.navigate("AddRecipePage", { userId })} // Passing userId to AddRecipePage
+        onPress={() => navigation.navigate("AddRecipePage", { userId })} 
       >
         <Ionicons name="add" size={36} color="#fff" />
       </TouchableOpacity>
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
   },
   addRecipeButton: {
     position: "absolute",
-    bottom: 80, // Adjust to position above the nav bar
+    bottom: 80, 
     right: 20,
     backgroundColor: "#CACBBA",
     width: 60,

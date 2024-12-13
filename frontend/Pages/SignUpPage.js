@@ -13,8 +13,8 @@ import { FontAwesome, MaterialCommunityIcons, Ionicons } from '@expo/vector-icon
 
 const API_BASE_URL =
   Platform.OS === "android"
-    ? "http://10.31.5.72:5224" // Android emulator
-    : "http://10.31.5.72:5224"; // iOS simulator or physical devices
+    ? "http://10.192.152.110:5224" 
+    : "http://10.192.152.110:5224"; // iOS simulator 
 
 
 export default function SignUpPage({ navigation }) {
@@ -23,14 +23,14 @@ export default function SignUpPage({ navigation }) {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-    // Handle user registration
+    
     const handleRegister = () => {
       if (username === '' || password === '') {
         Alert.alert('Error', 'Please enter username, email and password.');
         return;
       }
   
-      setIsLoading(true); // Start loading
+      setIsLoading(true); 
       fetch(`${API_BASE_URL}/register`, {
         method: 'POST',
         headers: {
@@ -39,7 +39,7 @@ export default function SignUpPage({ navigation }) {
         body: JSON.stringify({ username, password }),
       })
         .then((response) => {
-          setIsLoading(false); // Stop loading
+          setIsLoading(false); 
           if (response.ok) {
             Alert.alert('Success', 'User registered successfully!');
             navigation.navigate('HomePage');
@@ -48,7 +48,7 @@ export default function SignUpPage({ navigation }) {
           }
         })
         .catch((error) => {
-          setIsLoading(false); // Stop loading
+          setIsLoading(false); 
           console.error('Registration error:', error);
           Alert.alert('Error', 'Network request failed. Please try again.');
         });
@@ -129,7 +129,7 @@ export default function SignUpPage({ navigation }) {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F6F7E7', // Matches the background color in the design
+    backgroundColor: '#F6F7E7', 
   },
   container: {
     flex: 1,

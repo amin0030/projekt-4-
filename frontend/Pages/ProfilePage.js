@@ -18,7 +18,7 @@ export default function ProfilePage({ navigation }) {
     email: '',
     username: '',
   });
-  const userId = 1; // Replace with the actual logged-in user's ID
+  const userId = 1; 
 
   const fetchProfile = async () => {
     try {
@@ -26,7 +26,7 @@ export default function ProfilePage({ navigation }) {
       if (response.ok) {
         const data = await response.json();
         setUserData(data);
-        console.log('Profile data fetched:', data); // Debug log
+        console.log('Profile data fetched:', data); 
       } else {
         const errorData = await response.json();
         Alert.alert('Error', errorData.message || 'Failed to fetch profile');
@@ -39,7 +39,7 @@ export default function ProfilePage({ navigation }) {
 
   useEffect(() => {
     fetchProfile();
-    console.log('ProfilePage userId:', userId); // Debugging userId
+    console.log('ProfilePage userId:', userId); 
   }, []);
 
   return (
@@ -74,7 +74,7 @@ export default function ProfilePage({ navigation }) {
           <TouchableOpacity
             style={styles.menuItem}
             onPress={() => {
-              console.log('Navigating to FavouritesPage with userId:', userId); // Debug log
+              console.log('Navigating to FavouritesPage with userId:', userId); 
               navigation.navigate('FavouritesPage', { userId });
             }}
           >

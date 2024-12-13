@@ -14,11 +14,11 @@ namespace Projekt4.Models
         [Required]
         public string Quantity { get; set; } = string.Empty;
 
-        public string? Unit { get; set; } // Make Unit nullable
+        public string? Unit { get; set; } 
 
         public int RecipeId { get; set; }
 
-        // Avoid circular reference by ignoring during serialization
+        
         [JsonIgnore]
         public Recipe? Recipe { get; set; }
     }

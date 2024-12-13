@@ -2,19 +2,19 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import WelcomePage from './Pages/WelcomePage'; // Import the WelcomePage
+import WelcomePage from './Pages/WelcomePage'; 
 import LoginPage from './Pages/LoginPage';
 import SignUpPage from './Pages/SignUpPage';
 import HomePage from './Pages/Homepage';
 import RecipePage from './Pages/RecipePage';
 import CategoryPage from './Pages/CategoryPage';
 import SearchPage from './Pages/SearchPage';
-import ChatBotPage from './Pages/ChatBotPage'; // Import the ChatBotPage
+import ChatBotPage from './Pages/ChatBotPage'; 
 
 import ProfilePage from './Pages/ProfilePage';
 import MyProfilePage from './Pages/MyprofilePage';
 import FavouritesPage from './Pages/FavouritesPage';
-import AddRecipePage from './Pages/AddRecipePage'; // Import the AddRecipePage
+import AddRecipePage from './Pages/AddRecipePage'; 
 
 const Stack = createStackNavigator();
 
@@ -60,7 +60,7 @@ export default function App() {
         <Stack.Screen
           name="ChatBotPage"
           component={ChatBotPage}
-          options={{ title: 'ChatBot' }} // Add title for ChatBotPage
+          options={{ title: 'ChatBot' }} 
         />
          <Stack.Screen
           name="ProfilePage"
@@ -80,7 +80,7 @@ export default function App() {
         <Stack.Screen
           name="AddRecipePage"
           component={AddRecipePage}
-          options={{ title: 'Add New Recipe' }} // Customize the header title for AddRecipePage
+          options={{ title: 'Add New Recipe' }} 
         /> 
       </Stack.Navigator>
     </NavigationContainer>

@@ -16,22 +16,22 @@ import { FontAwesome, MaterialCommunityIcons, Ionicons } from "@expo/vector-icon
 
 const API_BASE_URL =
   Platform.OS === 'android'
-    ? 'http://10.31.5.72:5224' // Android emulator
-    : 'http://10.31.5.72:5224'; // iOS simulator or physical devices
+    ? 'http://10.192.152.110:5224' 
+    : 'http://10.192.152.110:5224'; 
 
 export default function LoginPage({ navigation }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // To show a loading indicator
+  const [isLoading, setIsLoading] = useState(false); 
 
-  // Handle user login
+  
   const handleLogin = () => {
     if (username === "" || password === "") {
       Alert.alert("Error", "Please enter both username and password.");
       return;
     }
 
-    setIsLoading(true); // Start loading
+    setIsLoading(true); 
     fetch(`${API_BASE_URL}/login`, {
       method: "POST",
       headers: {
@@ -40,7 +40,7 @@ export default function LoginPage({ navigation }) {
       body: JSON.stringify({ username, password }),
     })
       .then((response) => {
-        setIsLoading(false); // Stop loading
+        setIsLoading(false); 
         if (response.ok) {
           Alert.alert("Success", "You are now logged in!");
           navigation.navigate("HomePage");
@@ -56,7 +56,7 @@ export default function LoginPage({ navigation }) {
         }
       })
       .catch((error) => {
-        setIsLoading(false); // Stop loading
+        setIsLoading(false); 
         console.error("Login error:", error);
         Alert.alert("Error", "Network request failed. Please try again.");
       });
@@ -115,7 +115,7 @@ export default function LoginPage({ navigation }) {
         <TouchableOpacity
           style={styles.button}
           onPress={() => navigation.navigate("Signup")}
- // Navigate to SignUpPage
+
         >
           <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>

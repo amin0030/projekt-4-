@@ -12,7 +12,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { API_BASE_URL } from "../config";
 
-// Helper function to normalize image paths
+
 const normalizeImagePath = (imagePath) => {
   if (imagePath.startsWith("http") || imagePath.startsWith("file")) {
     return imagePath;
@@ -32,8 +32,7 @@ export default function RecipePage({ route, navigation }) {
 
     const initializeUserId = async () => {
       if (!paramUserId) {
-        console.warn("User ID not provided in navigation params. Using default userId = 1");
-        setUserId(1); // Default userId for testing
+        setUserId(1); 
       }
       fetchRecipeDetails();
     };
@@ -48,7 +47,7 @@ export default function RecipePage({ route, navigation }) {
       if (response.ok) {
         const data = await response.json();
 
-        // Normalize image path
+        
         data.image = normalizeImagePath(data.image);
 
         setRecipe(data);

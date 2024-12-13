@@ -16,14 +16,14 @@ namespace Projekt4.Models
         public string PasswordHash { get; set; }
 
         [NotMapped]
-        public string Password { get; set; } // Used only for plaintext passwords during login/registration
+        public string Password { get; set; } 
 
-        public string? FirstName { get; set; } // Nullable
-        public string? LastName { get; set; }  // Nullable
+        public string? FirstName { get; set; } 
+        public string? LastName { get; set; }  
 
-        public string? Email { get; set; } // Nullable (if needed)
+        public string? Email { get; set; } 
 
-        // Navigation property for favorite recipes
+        
         public ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
 
     }

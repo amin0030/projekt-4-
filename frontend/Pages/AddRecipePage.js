@@ -15,7 +15,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 
-const API_BASE_URL = 'http://10.31.5.72:5224'; // Replace with your actual API base URL
+const API_BASE_URL = 'http://10.192.152.110:5224'; 
 
 export default function AddRecipePage({ route, navigation }) {
     const { userId } = route.params;
@@ -34,7 +34,7 @@ export default function AddRecipePage({ route, navigation }) {
 
     const [isLoading, setIsLoading] = useState(false);
 
-    // Handle picking an image
+    
     const handlePickImage = async () => {
         const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (!permissionResult.granted) {
@@ -50,14 +50,14 @@ export default function AddRecipePage({ route, navigation }) {
         });
 
         if (!result.canceled) {
-            console.log("Selected Image URI:", result.assets[0].uri); // Debug URI
+            console.log("Selected Image URI:", result.assets[0].uri); 
             setImage(result.assets[0].uri);
         } else {
             console.log("Image selection canceled");
         }
     };
 
-    // Handle adding ingredients
+    
     const handleAddIngredient = () => {
         if (!ingredientName || !ingredientQuantity) {
             Alert.alert('Error', 'Please provide both ingredient name and quantity.');
@@ -68,7 +68,7 @@ export default function AddRecipePage({ route, navigation }) {
         setIngredientQuantity('');
     };
 
-    // Handle adding instructions
+    
     const handleAddInstruction = () => {
         if (!instructionStep || !instructionDescription) {
             Alert.alert('Error', 'Please provide both step number and description.');
@@ -82,7 +82,7 @@ export default function AddRecipePage({ route, navigation }) {
         setInstructionDescription('');
     };
 
-    // Function to handle adding recipe (POST request)
+    
     const handleAddRecipe = () => {
         if (!name || !description || !categoryId || ingredients.length === 0 || instructions.length === 0 || !image) {
             Alert.alert('Error', 'Please fill in all fields, add ingredients and instructions, and select an image.');
@@ -99,7 +99,7 @@ export default function AddRecipePage({ route, navigation }) {
             image: image,
         };
 
-        console.log("Submitting Recipe:", newRecipe); // Debugging
+        console.log("Submitting Recipe:", newRecipe); 
 
         setIsLoading(true);
 

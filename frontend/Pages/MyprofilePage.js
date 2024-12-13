@@ -12,17 +12,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { API_BASE_URL } from '../config';
 
 export default function MyProfilePage({ navigation }) {
-  const [firstName, setFirstName] = useState(''); // Default value for demonstration
-  const [lastName, setLastName] = useState('');   // Default value for demonstration
+  const [firstName, setFirstName] = useState(''); 
+  const [lastName, setLastName] = useState('');   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const userId = 1; // Replace this with the actual logged-in user's ID
+  const userId = 1; 
 
   const handleSaveChanges = async () => {
     const updatedProfile = {
       firstName: firstName,
       lastName: lastName,
-      username: `${firstName} ${lastName}`, // Optional: Create a username from first and last name
+      username: `${firstName} ${lastName}`, 
       email: email,
     };
 

@@ -4,13 +4,13 @@ import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator }
 import { API_BASE_URL } from '../config';
 
 export default function CategoryPage({ route, navigation }) {
-  const { categoryId } = route.params || {};  // Safely destructuring categoryId
+  const { categoryId } = route.params || {};  
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (categoryId) {  // Ensure categoryId exists before fetching
+    if (categoryId) {  
       fetchCategoryRecipes();
     } else {
       setError('Category ID is missing');

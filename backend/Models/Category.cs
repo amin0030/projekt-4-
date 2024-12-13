@@ -8,9 +8,9 @@ namespace Projekt4.Models
         public int Id { get; set; }
 
         [Required]
-        public string Name { get; set; } = string.Empty; // Set default value to avoid null warnings
+        public string Name { get; set; } = string.Empty; 
 
-        // Navigation property
-        public ICollection<Recipe> Recipes { get; set; } = new List<Recipe>(); // Initialize as an empty list
+        
+        public ICollection<Recipe> Recipes { get; set; } = new List<Recipe>(); 
     }
 }

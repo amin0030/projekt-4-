@@ -16,7 +16,7 @@ namespace Projekt4.Models
 
         public int RecipeId { get; set; }
 
-        // Avoid circular reference by ignoring during serialization
+        
         [JsonIgnore]
         public Recipe? Recipe { get; set; }
     }

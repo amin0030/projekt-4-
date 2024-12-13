@@ -21,7 +21,7 @@ namespace Projekt4.Controllers
         [HttpPost]
         public async Task<IActionResult> Chat([FromBody] ChatRequest request)
         {
-            // Log received message
+            
             Console.WriteLine("Received message: " + request?.Message);
 
             if (string.IsNullOrWhiteSpace(request?.Message))
@@ -29,10 +29,10 @@ namespace Projekt4.Controllers
                 return BadRequest(new { error = "Message cannot be empty." });
             }
 
-            // Brug Chat Completions API i stedet
+            
             var chatRequest = new ChatCompletionCreateRequest
             {
-                Model = "gpt-3.5-turbo", // Brug chatmodel
+                Model = "gpt-3.5-turbo", 
                 Messages = new[]
                 {
                     new OpenAI.GPT3.ObjectModels.RequestModels.ChatMessage(

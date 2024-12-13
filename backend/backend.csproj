@@ -31,6 +31,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <!-- Swagger/Swashbuckle til API-dokumentation -->
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.3.0" />
   </ItemGroup>
 
 </Project>

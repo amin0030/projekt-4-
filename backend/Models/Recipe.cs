@@ -15,14 +15,14 @@ namespace Projekt4.Models
 
         public string? Image { get; set; } = null; // Optional image URL
 
-        // Foreign key to the Category
+
         public int CategoryId { get; set; }
         
-        // Avoid circular reference by ignoring during serialization
+
         [JsonIgnore]
         public Category? Category { get; set; }
 
-        // Navigation properties for related entities
+        
         public ICollection<Ingredient> Ingredients { get; set; } = new List<Ingredient>();
         public ICollection<Instruction> Instructions { get; set; } = new List<Instruction>();
     }

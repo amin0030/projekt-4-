@@ -10,21 +10,21 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure the server to listen on all network interfaces
+
 builder.WebHost.UseUrls("http://0.0.0.0:5224");
 
-// Add database context with SQL Server connection and enable retry on failure
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
         sqlOptions => sqlOptions.EnableRetryOnFailure()));
 
-// Add OpenAI service
+
 builder.Services.AddOpenAIService(options =>
 {
     options.ApiKey = builder.Configuration["OpenAI:ApiKey"];
 });
 
-// Add CORS to allow connections from React Native frontend
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", builder =>
@@ -35,7 +35,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Add controllers with options to handle reference loops in JSON serialization
+
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -43,7 +43,7 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     });
 
-// Add Swagger services
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -57,18 +57,17 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-// Ensure Swagger works for both Development and Production
+
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
     options.SwaggerEndpoint("/swagger/v1/swagger.json", "Projekt4 API v1");
-    options.RoutePrefix = ""; // Serve Swagger UI at root ("/")
+    options.RoutePrefix = ""; 
 });
 
-// Enable CORS with the "AllowAll" policy
+
 app.UseCors("AllowAll");
 
-// Enable routing and map controllers
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
@@ -79,16 +78,16 @@ app.UseStaticFiles(new StaticFileOptions
 app.UseRouting();
 app.UseEndpoints(endpoints =>
 {
-    endpoints.MapControllers(); // Map all controller routes
+    endpoints.MapControllers();
 
-    // Endpoint: Get All Categories
+
     endpoints.MapGet("/categories", async (AppDbContext db) =>
     {
         var categories = await db.Categories.ToListAsync();
         return Results.Ok(categories);
     });
 
-    // Endpoint: Get Recipe by ID
+
     endpoints.MapGet("/recipes/{recipeId}", async (AppDbContext db, int recipeId) =>
     {
         var recipe = await db.Recipes
@@ -114,7 +113,7 @@ app.UseEndpoints(endpoints =>
         return Results.Ok(recipeDetails);
     });
 
-    // Endpoint: Get Recipes by Category
+
     endpoints.MapGet("/categories/{categoryId}/recipes", async (AppDbContext db, int categoryId) =>
     {
         var category = await db.Categories.Include(c => c.Recipes).FirstOrDefaultAsync(c => c.Id == categoryId);
@@ -134,7 +133,7 @@ app.UseEndpoints(endpoints =>
         return Results.Ok(recipes);
     });
 
-    // Endpoint: Get All Recipes
+
     endpoints.MapGet("/recipes", async (AppDbContext db) =>
     {
         var recipes = await db.Recipes
@@ -154,7 +153,7 @@ app.UseEndpoints(endpoints =>
         return Results.Ok(recipes);
     });
 
-    // Endpoint: Search Recipes
+
     endpoints.MapGet("/recipes/search", async (AppDbContext db, string query) =>
     {
         var recipes = await db.Recipes
@@ -175,11 +174,11 @@ app.UseEndpoints(endpoints =>
         return Results.Ok(recipes);
     });
 
-    // Endpoint: Save User Profile
+
     endpoints.MapPut("/users/{id}/profile", async (AppDbContext db, int id, User updatedProfile) =>
     {
         var user = await db.Users
-    .Include(u => u.Favorites) // Use Favorites, as defined in the User model
+    .Include(u => u.Favorites) 
     .FirstOrDefaultAsync(u => u.Id == id);
 
         if (user == null)
@@ -187,7 +186,7 @@ app.UseEndpoints(endpoints =>
             return Results.NotFound("User not found.");
         }
 
-        // Update fields
+
         user.FirstName = updatedProfile.FirstName ?? user.FirstName;
         user.LastName = updatedProfile.LastName ?? user.LastName;
         user.Username = updatedProfile.Username ?? user.Username;
@@ -209,7 +208,7 @@ app.UseEndpoints(endpoints =>
         });
     });
 
-    // Endpoint: Get User Profile
+
     endpoints.MapGet("/users/{id}/profile", async (AppDbContext db, int id) =>
     {
         var user = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
@@ -228,7 +227,7 @@ app.UseEndpoints(endpoints =>
         });
     });
 
-    // Endpoint: Create Recipe for Logged-In User
+    
     endpoints.MapPost("/users/{userId}/recipes", async (AppDbContext db, int userId, Recipe recipe) =>
     {
         var user = await db.Users.FirstOrDefaultAsync(u => u.Id == userId);
@@ -248,12 +247,12 @@ app.UseEndpoints(endpoints =>
         return Results.Created($"/recipes/{recipe.Id}", recipe);
     });
 
- // Unified Endpoint: Handle Fetching and Adding Favorites
+ 
 endpoints.MapPost("/users/{userId}/favorites", async (AppDbContext db, int userId, FavoriteRequest? favoriteRequest) =>
 {
     Console.WriteLine($"Handling favorites for UserId={userId}");
 
-    // Fetch favorites if no request body is provided
+    
     if (favoriteRequest == null)
     {
         Console.WriteLine("Fetching favorites...");
@@ -273,7 +272,7 @@ endpoints.MapPost("/users/{userId}/favorites", async (AppDbContext db, int userI
         return Results.Ok(favorites);
     }
 
-    // Add to favorites if request body is provided
+    
     Console.WriteLine($"Received FavoriteRequest: {JsonSerializer.Serialize(favoriteRequest)}");
 
     if (favoriteRequest.RecipeId <= 0)
@@ -310,7 +309,7 @@ endpoints.MapPost("/users/{userId}/favorites", async (AppDbContext db, int userI
 
 
 
-    // Endpoint for user registration
+    
 app.MapPost("/register", async (AppDbContext db, User user) =>
 {
     if (string.IsNullOrEmpty(user.Username) || string.IsNullOrEmpty(user.Password))
@@ -318,17 +317,16 @@ app.MapPost("/register", async (AppDbContext db, User user) =>
         return Results.BadRequest("Username and password are required.");
     }
 
-    // Check if username already exists
+    
     var existingUser = await db.Users.FirstOrDefaultAsync(u => u.Username == user.Username);
     if (existingUser != null)
     {
         return Results.BadRequest("Username already exists.");
     }
 
-    // Hash the password and save the user
+    
     user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.Password);
-    user.Password = null; // Avoid storing plain text passwords
-
+    user.Password = null; 
     db.Users.Add(user);
     await db.SaveChangesAsync();
 
@@ -336,7 +334,7 @@ app.MapPost("/register", async (AppDbContext db, User user) =>
 });
 
 
-    // Endpoint: User Login
+    
     endpoints.MapPost("/login", async (AppDbContext db, UserLogin login) =>
     {
         var user = await db.Users.FirstOrDefaultAsync(u => u.Username == login.Username);
@@ -354,7 +352,7 @@ app.MapPost("/register", async (AppDbContext db, User user) =>
         });
     });
 
-    // Endpoint: Delete Account
+
     endpoints.MapDelete("/users/{id}", async (AppDbContext db, int id) =>
     {
         var user = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
@@ -368,7 +366,7 @@ app.MapPost("/register", async (AppDbContext db, User user) =>
         return Results.Ok("User account deleted successfully.");
     });
 
-    // Endpoint: Chatbot using OpenAI GPT
+
     endpoints.MapPost("/chat", async (IOpenAIService openAIService, HttpContext context) =>
     {
         using var reader = new StreamReader(context.Request.Body);
@@ -402,8 +400,8 @@ app.MapPost("/register", async (AppDbContext db, User user) =>
 
 app.Run();
 
-// ChatRequest model
+
 public class ChatRequest
 {
-    public string Message { get; set; } = string.Empty; // Default value added
+    public string Message { get; set; } = string.Empty; 
 }
